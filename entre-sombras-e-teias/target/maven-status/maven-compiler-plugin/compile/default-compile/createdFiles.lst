@@ -22,6 +22,6 @@ com\mycompany\entreSombrasETeias\controller\ModoHistoriaController.class
 com\mycompany\entreSombrasETeias\util\SceneManager.class
 com\mycompany\entreSombrasETeias\controller\GameplayController$2.class
 com\mycompany\entreSombrasETeias\controller\TeiaConfrontosController.class
-com\mycompany\entreSombrasETeias\dao\RankingDAO.class
 com\mycompany\entreSombrasETeias\controller\InventarioController.class
+com\mycompany\entreSombrasETeias\dao\RankingDAO.class
 com\mycompany\entreSombrasETeias\jogo\Main.class

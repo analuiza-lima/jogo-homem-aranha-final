@@ -39,39 +39,42 @@ public class TeiaConfrontosController {
         todosBotoes.add(btnOctopus);
         todosBotoes.add(btnDuende);
 
-        // Renderiza em P&B com segurança contra caminhos errados de arquivos
+        // Inicializa o botão de confirmar totalmente opaco e desabilitado visualmente por CSS padrão
+        btnConfirmar.setDisable(true);
+
         resetarImagensParaPretoEBranco();
     }
 
-            @FXML
-         void selecionarAbutre(ActionEvent event) {
-             processarSelecao(btnAbutre, imgAbutre, "abutre", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-abutre-escolha-vilao.jpg");
-         }
+    @FXML
+    void selecionarAbutre(ActionEvent event) {
+        processarSelecao(btnAbutre, imgAbutre, "abutre", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-abutre-escolha-vilao.jpg");
+    }
 
-         @FXML
-         void selecionarShocker(ActionEvent event) {
-             processarSelecao(btnShocker, imgShocker, "shocker", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-shocker-escolha-vilao.jpg");
-         }
+    @FXML
+    void selecionarShocker(ActionEvent event) {
+        processarSelecao(btnShocker, imgShocker, "shocker", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-shocker-escolha-vilao.jpg");
+    }
 
-         @FXML
-         void selecionarLagarto(ActionEvent event) {
-             processarSelecao(btnLagarto, imgLagarto, "lagarto", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-lagarto-escolha-vilao.jpg");
-         }
+    @FXML
+    void selecionarLagarto(ActionEvent event) {
+        processarSelecao(btnLagarto, imgLagarto, "lagarto", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-lagarto-escolha-vilao.jpg");
+    }
 
-         @FXML
-         void selecionarElectro(ActionEvent event) {
-             processarSelecao(btnElectro, imgElectro, "electro", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-electro-escolha-vilao.jpeg");
-         }
+    @FXML
+    void selecionarElectro(ActionEvent event) {
+        processarSelecao(btnElectro, imgElectro, "electro", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-electro-escolha-vilao.jpeg");
+    }
 
-         @FXML
-         void selecionarOctopus(ActionEvent event) {
-             processarSelecao(btnOctopus, imgOctopus, "octopus", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-octopus-escolha-vilao.jpeg");
-         }
+    @FXML
+    void selecionarOctopus(ActionEvent event) {
+        processarSelecao(btnOctopus, imgOctopus, "octopus", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-octopus-escolha-vilao.jpeg");
+    }
 
-         @FXML
-         void selecionarDuende(ActionEvent event) {
-             processarSelecao(btnDuende, imgDuende, "duende", "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde.jpg");
-         }
+    @FXML
+    void selecionarDuende(ActionEvent event) {
+        processarSelecao(btnDuende, imgDuende, "duende", "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde.jpg");
+    }
+
     private void processarSelecao(Button botaoClicado, ImageView imgView, String nomeVilao, String caminhoImagemColorida) {
         resetarImagensParaPretoEBranco();
         
@@ -92,17 +95,20 @@ public class TeiaConfrontosController {
             System.err.println("Erro ao carregar textura colorida: " + caminhoImagemColorida);
         }
 
+        // Ativa o botão de confirmação
         btnConfirmar.setDisable(false);
+        btnConfirmar.setStyle("-fx-min-width: 320px; -fx-font-size: 14px; -fx-font-family: 'Press Start 2P'; -fx-background-color: #ff2222; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-width: 2; -fx-opacity: 1.0;");
     }
 
-   private void resetarImagensParaPretoEBranco() {
-    carregarImagemSegura(imgAbutre, "/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-pb.jpeg");
-    carregarImagemSegura(imgShocker, "/com/mycompany/entreSombrasETeias/jogo/imagens/shocker-pb.jpeg");
-    carregarImagemSegura(imgLagarto, "/com/mycompany/entreSombrasETeias/jogo/imagens/lagarto-pb.jpeg");
-    carregarImagemSegura(imgElectro, "/com/mycompany/entreSombrasETeias/jogo/imagens/electro-pb.jpeg");
-    carregarImagemSegura(imgOctopus, "/com/mycompany/entreSombrasETeias/jogo/imagens/octopus-pb.jpeg");
-    carregarImagemSegura(imgDuende, "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde-branco.png");
-}
+    private void resetarImagensParaPretoEBranco() {
+        carregarImagemSegura(imgAbutre, "/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-pb.jpeg");
+        carregarImagemSegura(imgShocker, "/com/mycompany/entreSombrasETeias/jogo/imagens/shocker-pb.jpeg");
+        carregarImagemSegura(imgLagarto, "/com/mycompany/entreSombrasETeias/jogo/imagens/lagarto-pb.jpeg");
+        carregarImagemSegura(imgElectro, "/com/mycompany/entreSombrasETeias/jogo/imagens/electro-pb.jpeg");
+        carregarImagemSegura(imgOctopus, "/com/mycompany/entreSombrasETeias/jogo/imagens/octopus-pb.jpeg");
+        carregarImagemSegura(imgDuende, "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde-branco.png");
+    }
+
     private void carregarImagemSegura(ImageView imgView, String caminho) {
         try {
             java.io.InputStream stream = getClass().getResourceAsStream(caminho);
@@ -120,13 +126,14 @@ public class TeiaConfrontosController {
     void confirmarConfronto(ActionEvent event) {
         if (!vilaoEscolhido.isEmpty()) {
             System.out.println("Batalha iniciada contra: " + vilaoEscolhido);
-            // Insira aqui a chamada para sua gameplay
+            
+            // Exemplo de redirecionamento para a tela de gameplay (Altere para o caminho correto do seu jogo)
+            SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/batalha.fxml");
         }
     }
 
     @FXML
     void voltarMenu(ActionEvent event) {
-        // Redireciona com segurança usando o seu gerenciador centralizado
         SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
     }
 }
