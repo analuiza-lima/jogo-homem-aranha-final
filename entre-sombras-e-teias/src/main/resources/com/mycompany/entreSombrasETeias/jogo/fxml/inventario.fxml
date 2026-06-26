@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Button?>
+<?import java.net.URL?>
+
+<AnchorPane prefHeight="400.0" prefWidth="400.0" styleClass="root-container" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.InventarioController">
+   <stylesheets>
+       <URL value="@../css/estilo.css" />
+   </stylesheets>
+   <children>
+      <Label layoutX="130.0" layoutY="20.0" styleClass="titulo-tela" style="-fx-font-size: 20;" text="🎒 INVENTÁRIO" />
+      
+      <Label fx:id="labelNome" layoutX="30.0" layoutY="65.0" styleClass="label-jogador" text="Jogador:" />
+      <Label fx:id="labelHP" layoutX="30.0" layoutY="90.0" styleClass="label-hp" text="HP:" />
+      <Label fx:id="labelXP" layoutX="150.0" layoutY="90.0" styleClass="label-xp" text="XP:" />
+      
+      <ListView fx:id="listaItens" layoutX="30.0" layoutY="130.0" prefHeight="200.0" prefWidth="340.0" />
+      
+      <Button layoutX="160.0" layoutY="350.0" onAction="#fechar" prefWidth="80.0" styleClass="btn-padrao, btn-vermelho" text="FECHAR" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Button?>
+<?import java.net.URL?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.RankingController" alignment="CENTER" spacing="16" styleClass="vbox-container">
+    <stylesheets>
+        <URL value="@../css/estilo.css" />
+    </stylesheets>
+
+    <Label text="🏆 Ranking Global" styleClass="titulo-tela"/>
+
+    <TableView fx:id="tabelaRanking" prefHeight="400" prefWidth="700">
+        <columns>
+            <TableColumn fx:id="colNome" text="Jogador" prefWidth="180"/>
+            <TableColumn fx:id="colXP" text="XP" prefWidth="120"/>
+            <TableColumn fx:id="colEpisodio" text="Episódio" prefWidth="120"/>
+            <TableColumn fx:id="colData" text="Data" prefWidth="200"/>
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER" spacing="20">
+        <Button text="💾 Exportar CSV" onAction="#exportarCSV" styleClass="btn-padrao, btn-azul" style="-fx-font-size: 14;"/>
+        <Button text="← Voltar" onAction="#voltar" styleClass="btn-padrao, btn-escuro" style="-fx-font-size: 14;"/>
+    </HBox>
+</VBox>

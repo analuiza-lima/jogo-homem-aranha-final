@@ -1,0 +1,149 @@
+    /* ==========================================================================
+       1. LAYOUT FULLSCREEN (IGUAL AOS WIREFRAMES)
+       ========================================================================== */
+    .root, .root-container, .vbox-container {
+        -fx-background-color: #060612; /* Azul escuro quase preto */
+        -fx-font-family: "Segoe UI", Arial, sans-serif;
+        -fx-min-width: 800px;
+        -fx-min-height: 600px;
+    }
+
+    /*fonte: */
+    
+    @font-face {
+    font-family: 'Press Start 2P';
+    src: url('caminho/para/PressStart2P.ttf');
+}
+
+    /* Força os contêineres principais a respirarem e ocuparem espaço */
+    .vbox-container {
+        -fx-padding: 40px;
+        -fx-alignment: center;
+    }
+
+    /* Títulos grandes e centralizados */
+    .titulo-tela {
+        -fx-font-size: 32px;
+        -fx-text-fill: #e63946; /* Vermelho Aranha vibrante */
+        -fx-font-weight: bold;
+        -fx-alignment: center;
+        -fx-text-alignment: center;
+    }
+
+    .subtitulo-tela {
+        -fx-font-size: 16px;
+        -fx-text-fill: #adb5bd;
+    }
+
+    /* ==========================================================================
+       2. TELA: TEIA DE CONFRONTOS (SELEÇÃO DE VILÕES)
+       ========================================================================== */
+    .grid-teia {
+        -fx-hgap: 25px;
+        -fx-vgap: 25px;
+        -fx-alignment: center;
+    }
+
+    /* Botão do ícone do vilão - Quadrado grande do wireframe */
+    .btn-icon-vilao {
+        -fx-background-color: #161a1d;
+        -fx-border-color: #343a40;
+        -fx-border-width: 3px;
+        -fx-border-radius: 8px;
+        -fx-background-radius: 8px;
+        -fx-min-width: 140px;
+        -fx-min-height: 140px;
+        -fx-max-width: 140px;
+        -fx-max-height: 140px;
+        -fx-cursor: hand;
+        -fx-padding: 0;
+    }
+
+    /* Efeito quando passa o mouse por cima */
+    .btn-icon-vilao:hover {
+        -fx-border-color: #457b9d; /* Azul teia */
+        -fx-effect: dropshadow(three-pass-box, rgba(69, 123, 157, 0.4), 10, 0, 0, 0);
+    }
+
+    /* CLASSE CRÍTICA: Quando o vilão é selecionado no clique */
+    .btn-icon-vilao.selecionado {
+        -fx-border-color: #ffd166 !important; /* Dourado de destaque */
+        -fx-background-color: #1d1d2e;
+        -fx-effect: dropshadow(three-pass-box, rgba(255, 209, 102, 0.7), 15, 0, 0, 0);
+    }
+
+    /* Se o vilão estiver trancado por falta de progresso */
+    .btn-icon-vilao:disabled {
+        -fx-opacity: 0.4;
+        -fx-border-color: #212529 !important;
+        -fx-cursor: default;
+    }
+
+    /* ==========================================================================
+       3. BOTÕES GERAIS E INTERFACES (AMPLIADOS)
+       ========================================================================== */
+    .btn-padrao {
+        -fx-text-fill: white;
+        -fx-font-size: 15px;
+        -fx-font-weight: bold;
+        -fx-cursor: hand;
+        -fx-min-height: 45px;
+        -fx-min-width: 200px;
+        -fx-background-radius: 5px;
+        -fx-border-radius: 5px;
+    }
+
+    .btn-vermelho { -fx-background-color: #e63946; }
+    .btn-vermelho:hover { -fx-background-color: #ff4d5a; }
+
+    .btn-azul { -fx-background-color: #457b9d; }
+    .btn-azul:hover { -fx-background-color: #5794bd; }
+
+    .btn-verde { -fx-background-color: #2a9d8f; }
+    .btn-verde:hover { -fx-background-color: #35bdae; }
+
+    .btn-escuro {
+        -fx-background-color: #212529;
+        -fx-border-color: #495057;
+    }
+    .btn-escuro:hover {
+        -fx-background-color: #343a40;
+        -fx-border-color: #ffd166;
+    }
+
+    /* Componentes de dados internos */
+    .painel-interno {
+        -fx-background-color: #1d1d2e;
+        -fx-padding: 20px;
+        -fx-background-radius: 8px;
+    }
+
+    .table-view, .list-view {
+        -fx-background-color: #1d1d2e;
+        -fx-text-fill: white;
+    }
+    
+    /*para mudar a fonte da tela inicial */
+    @font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonte/PressStart2P-Regular.ttf'); 
+    }
+
+   /* 2. Cria uma classe CSS para o título */
+   .titulo-retro {
+    -fx-font-family: 'Press Start 2P';
+    -fx-font-size: 32px;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    }
+
+  /* 3. Cria uma classe CSS para os botões */
+   .btn-retro {
+    -fx-font-family: 'Press Start 2P';
+    -fx-font-size: 16px; /* Fontes pixeladas costumam ficar gigantes, 16px ou 18px costuma ser o ideal */
+    -fx-min-width: 180px;
+    -fx-background-color: #ff2222;
+    -fx-text-fill: black;
+    -fx-background-radius: 5;
+}
+                

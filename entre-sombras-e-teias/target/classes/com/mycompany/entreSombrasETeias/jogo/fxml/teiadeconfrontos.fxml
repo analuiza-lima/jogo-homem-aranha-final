@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.ImageView?>
+<?import java.net.URL?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.mycompany.entreSombrasETeias.controller.TeiaConfrontosController" 
+            prefWidth="800" prefHeight="600" 
+            style="-fx-background-image: url('com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center; -fx-font-family: 'Press Start 2P';">
+    
+    <stylesheets>
+        <URL value="@../css/estilo.css" />
+    </stylesheets>
+
+    <VBox alignment="CENTER" spacing="10.0" AnchorPane.topAnchor="30.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <HBox alignment="CENTER" style="-fx-background-color: rgba(230, 57, 70, 0.85); -fx-padding: 15; -fx-background-radius: 5;">
+            <Label text="TEIA DE CONFRONTOS" style="-fx-text-fill: #000000; -fx-font-size: 28; -fx-font-family: 'Press Start 2P'; -fx-font-weight: bold;" />
+        </HBox>
+        <Label text="Selecione o vilão que deseja enfrentar para iniciar a batalha" style="-fx-text-fill: white; -fx-font-size: 11px; -fx-font-family: 'Press Start 2P'; -fx-effect: dropshadow(three-pass-box, black, 4, 0, 0, 0);" />
+    </VBox>
+
+    <HBox alignment="CENTER" spacing="15.0" prefHeight="160.0" AnchorPane.topAnchor="180.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+        <children>
+            <Button fx:id="btnAbutre" onAction="#selecionarAbutre" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;">
+                <graphic>
+                    <ImageView fx:id="imgAbutre" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="true" />
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnShocker" onAction="#selecionarShocker" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;">
+                <graphic>
+                    <ImageView fx:id="imgShocker" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="true" />
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnLagarto" onAction="#selecionarLagarto" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;">
+                <graphic>
+                    <ImageView fx:id="imgLagarto" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="true" />
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnElectro" onAction="#selecionarElectro" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;">
+                <graphic>
+                    <ImageView fx:id="imgElectro" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="true" />
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnOctopus" onAction="#selecionarOctopus" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;">
+                <graphic>
+                    <ImageView fx:id="imgOctopus" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="true" />
+                </graphic>
+            </Button>
+
+            <Button fx:id="btnDuende" onAction="#selecionarDuende" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;">
+                <graphic>
+                    <ImageView fx:id="imgDuende" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="true" />
+                </graphic>
+            </Button>
+        </children>
+    </HBox>
+
+    <VBox alignment="CENTER" spacing="15.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
+        <children>
+            <Button fx:id="btnConfirmar" text="APERTE AQUI PARA JOGAR" disable="true" onAction="#confirmarConfronto" styleClass="btn-padrao, btn-vermelho" style="-fx-min-width: 320px; -fx-font-size: 14px; -fx-font-family: 'Press Start 2P'; -fx-background-color: #ff2222; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-width: 2;" />
+            <Button text="← VOLTAR AO MENU" onAction="#voltarMenu" styleClass="btn-padrao, btn-escuro" style="-fx-min-width: 320px; -fx-font-size: 14px; -fx-font-family: 'Press Start 2P'; -fx-background-color: #333333; -fx-text-fill: white; -fx-background-radius: 5; -fx-border-color: black; -fx-border-width: 2;" />
+        </children>
+    </VBox>
+
+</AnchorPane>
