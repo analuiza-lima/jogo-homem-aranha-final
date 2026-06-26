@@ -6,6 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import com.mycompany.entreSombrasETeias.util.SceneManager;
+import com.mycompany.entreSombrasETeias.util.SessaoJogo;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class TeiaConfrontosController {
     private Button botaoSelecionadoAtual = null;
     private String vilaoEscolhido = "";
     private List<Button> todosBotoes = new ArrayList<>();
+    private List<ImageView> todasImagens = new ArrayList<>();
 
     @FXML
     public void initialize() {
@@ -39,73 +42,106 @@ public class TeiaConfrontosController {
         todosBotoes.add(btnOctopus);
         todosBotoes.add(btnDuende);
 
+        todasImagens.add(imgAbutre);
+        todasImagens.add(imgShocker);
+        todasImagens.add(imgLagarto);
+        todasImagens.add(imgElectro);
+        todasImagens.add(imgOctopus);
+        todasImagens.add(imgDuende);
+
+        // Configura todas as ImageViews para preencherem totalmente o espaço do ícone
+        configurarTamanhoImagens();
+
         // Renderiza em P&B com segurança contra caminhos errados de arquivos
         resetarImagensParaPretoEBranco();
+        
+        // Garante que o botão de confirmar comece desativado até escolherem um vilão
+        if (btnConfirmar != null) {
+            btnConfirmar.setDisable(true);
+        }
     }
 
-            @FXML
-         void selecionarAbutre(ActionEvent event) {
-             processarSelecao(btnAbutre, imgAbutre, "abutre", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-abutre-escolha-vilao.jpg");
-         }
+    private void configurarTamanhoImagens() {
+        for (ImageView img : todasImagens) {
+            if (img != null) {
+                img.setPreserveRatio(false); // Permite esticar/ajustar perfeitamente ao tamanho estipulado
+                img.setSmooth(true);
+            }
+        }
+    }
 
-         @FXML
-         void selecionarShocker(ActionEvent event) {
-             processarSelecao(btnShocker, imgShocker, "shocker", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-shocker-escolha-vilao.jpg");
-         }
+    @FXML
+    void selecionarAbutre(ActionEvent event) {
+        processarSelecao(btnAbutre, imgAbutre, "abutre", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-abutre-escolha-vilao.jpg");
+    }
 
-         @FXML
-         void selecionarLagarto(ActionEvent event) {
-             processarSelecao(btnLagarto, imgLagarto, "lagarto", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-lagarto-escolha-vilao.jpg");
-         }
+    @FXML
+    void selecionarShocker(ActionEvent event) {
+        processarSelecao(btnShocker, imgShocker, "shocker", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-shocker-escolha-vilao.jpg");
+    }
 
-         @FXML
-         void selecionarElectro(ActionEvent event) {
-             processarSelecao(btnElectro, imgElectro, "electro", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-electro-escolha-vilao.jpeg");
-         }
+    @FXML
+    void selecionarLagarto(ActionEvent event) {
+        processarSelecao(btnLagarto, imgLagarto, "lagarto", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-lagarto-escolha-vilao.jpg");
+    }
 
-         @FXML
-         void selecionarOctopus(ActionEvent event) {
-             processarSelecao(btnOctopus, imgOctopus, "octopus", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-octopus-escolha-vilao.jpeg");
-         }
+    @FXML
+    void selecionarElectro(ActionEvent event) {
+        processarSelecao(btnElectro, imgElectro, "electro", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-electro-escolha-vilao.jpeg");
+    }
 
-         @FXML
-         void selecionarDuende(ActionEvent event) {
-             processarSelecao(btnDuende, imgDuende, "duende", "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde.jpg");
-         }
+    @FXML
+    void selecionarOctopus(ActionEvent event) {
+        processarSelecao(btnOctopus, imgOctopus, "octopus", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-octopus-escolha-vilao.jpeg");
+    }
+
+    @FXML
+    void selecionarDuende(ActionEvent event) {
+        processarSelecao(btnDuende, imgDuende, "duende", "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde.jpg");
+    }
+
     private void processarSelecao(Button botaoClicado, ImageView imgView, String nomeVilao, String caminhoImagemColorida) {
         resetarImagensParaPretoEBranco();
         
         for (Button btn : todosBotoes) {
-            btn.setStyle("-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;");
+            if (btn != null) {
+                btn.setStyle("-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;");
+            }
         }
 
         this.botaoSelecionadoAtual = botaoClicado;
         this.vilaoEscolhido = nomeVilao;
 
         // Borda destacada em vermelho puro ao selecionar
-        botaoClicado.setStyle("-fx-cursor: hand; -fx-background-color: rgba(255,34,34,0.3); -fx-border-color: #ff2222; -fx-border-width: 3;");
+        if (botaoClicado != null) {
+            botaoClicado.setStyle("-fx-cursor: hand; -fx-background-color: rgba(255,34,34,0.3); -fx-border-color: #ff2222; -fx-border-width: 3;");
+        }
 
-        try {
-            Image imgColorida = new Image(getClass().getResourceAsStream(caminhoImagemColorida));
-            imgView.setImage(imgColorida);
+        try (InputStream is = getClass().getResourceAsStream(caminhoImagemColorida)) {
+            if (is != null) {
+                imgView.setImage(new Image(is));
+            }
         } catch (Exception e) {
             System.err.println("Erro ao carregar textura colorida: " + caminhoImagemColorida);
         }
 
-        btnConfirmar.setDisable(false);
+        if (btnConfirmar != null) {
+            btnConfirmar.setDisable(false);
+        }
     }
 
-   private void resetarImagensParaPretoEBranco() {
-    carregarImagemSegura(imgAbutre, "/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-pb.jpeg");
-    carregarImagemSegura(imgShocker, "/com/mycompany/entreSombrasETeias/jogo/imagens/shocker-pb.jpeg");
-    carregarImagemSegura(imgLagarto, "/com/mycompany/entreSombrasETeias/jogo/imagens/lagarto-pb.jpeg");
-    carregarImagemSegura(imgElectro, "/com/mycompany/entreSombrasETeias/jogo/imagens/electro-pb.jpeg");
-    carregarImagemSegura(imgOctopus, "/com/mycompany/entreSombrasETeias/jogo/imagens/octopus-pb.jpeg");
-    carregarImagemSegura(imgDuende, "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde-branco.png");
-}
+    private void resetarImagensParaPretoEBranco() {
+        carregarImagemSegura(imgAbutre, "/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-pb.jpeg");
+        carregarImagemSegura(imgShocker, "/com/mycompany/entreSombrasETeias/jogo/imagens/shocker-pb.jpeg");
+        carregarImagemSegura(imgLagarto, "/com/mycompany/entreSombrasETeias/jogo/imagens/lagarto-pb.jpeg");
+        carregarImagemSegura(imgElectro, "/com/mycompany/entreSombrasETeias/jogo/imagens/electro-pb.jpeg");
+        carregarImagemSegura(imgOctopus, "/com/mycompany/entreSombrasETeias/jogo/imagens/octopus-pb.jpeg");
+        carregarImagemSegura(imgDuende, "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde-branco.png");
+    }
+
     private void carregarImagemSegura(ImageView imgView, String caminho) {
-        try {
-            java.io.InputStream stream = getClass().getResourceAsStream(caminho);
+        if (imgView == null) return;
+        try (InputStream stream = getClass().getResourceAsStream(caminho)) {
             if (stream != null) {
                 imgView.setImage(new Image(stream));
             } else {
@@ -120,13 +156,17 @@ public class TeiaConfrontosController {
     void confirmarConfronto(ActionEvent event) {
         if (!vilaoEscolhido.isEmpty()) {
             System.out.println("Batalha iniciada contra: " + vilaoEscolhido);
-            // Insira aqui a chamada para sua gameplay
+            
+            // Define o vilão selecionado na sua estrutura de sessão para que a tela de combate saiba com quem lutar
+            SessaoJogo.get().setVilaoAtual(vilaoEscolhido); 
+            
+            // Troca para a tela onde a gameplay/combate acontece de fato
+            SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/gameplay.fxml");
         }
     }
 
     @FXML
     void voltarMenu(ActionEvent event) {
-        // Redireciona com segurança usando o seu gerenciador centralizado
         SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
     }
 }

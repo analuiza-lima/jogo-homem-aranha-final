@@ -36,7 +36,6 @@ public class GameplayController implements Initializable {
     @FXML private Label      labelDialogoVilao;
     @FXML private Label      labelDialogoPeter;
     
-    // Trocado de Label para ImageView para exibir o Homem-Aranha Correndo (GIF)
     @FXML private ImageView  iconeCoracaoAranha;
     
     @FXML private ProgressBar barraHpJogador;
@@ -75,121 +74,100 @@ public class GameplayController implements Initializable {
 
     private int      indiceDialogo = 0;
     private String[] dialogoAtual;
+    private int      episodioResolvido = 1; // Guarda o episódio atual da partida
 
-        @Override
-        public void initialize(URL url, ResourceBundle rb) {
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        jogador = SessaoJogo.get().getJogador();
+        
+        // Determina se o jogo usará o vilão escolhido na Teia ou o nível atual da campanha
+        String vilaoLogado = SessaoJogo.get().getVilaoAtual();
+        
+        if (vilaoLogado != null && !vilaoLogado.isEmpty()) {
+            switch (vilaoLogado.toLowerCase()) {
+                case "abutre":   episodioResolvido = 1; break;
+                case "shocker":  episodioResolvido = 2; break;
+                case "lagarto":  episodioResolvido = 3; break;
+                case "electro":  episodioResolvido = 4; break;
+                case "octopus":  episodioResolvido = 5; break;
+                case "duende":   episodioResolvido = 6; break;
+                default:         episodioResolvido = 1; break;
+            }
+        } else {
+            episodioResolvido = (jogador != null) ? jogador.getNivelAtual() : 1;
+        }
 
-         jogador = SessaoJogo.get().getJogador();
-         int ep = jogador.getNivelAtual();
+        try {
+            vilao = new VilaoDAO().buscarPorEpisodio(episodioResolvido);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
 
-         try {
-             vilao = new VilaoDAO().buscarPorEpisodio(ep);
-         } catch (SQLException e) {
-             e.printStackTrace();
-             return;
-         }
+        if (vilao != null) {
+            if (labelVilaoNome != null)
+                labelVilaoNome.setText(vilao.getNome());
 
-         if (vilao != null) {
+            String nomeBase = vilao.getNome().toLowerCase().replace(" ", "");
+            String[] extensoes = {".png", ".jpg", ".jpeg"};
+            java.io.InputStream stream = null;
 
-             if (labelVilaoNome != null)
-                 labelVilaoNome.setText(vilao.getNome());
+            for (String ext : extensoes) {
+                String caminho = "/com/mycompany/entreSombrasETeias/jogo/imagens/"
+                        + nomeBase
+                        + "-tela-de-vilao"
+                        + ext;
 
-             String nomeBase = vilao.getNome().toLowerCase().replace(" ", "");
+                stream = getClass().getResourceAsStream(caminho);
+                if (stream != null) break;
+            }
 
-             String[] extensoes = {
-                 ".png",
-                 ".jpg",
-                 ".jpeg"
-             };
+            if (stream != null && imgVilao != null) {
+                try {
+                    imgVilao.setImage(new Image(stream));
+                    stream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
-             java.io.InputStream stream = null;
+        try (java.io.InputStream stream = getClass().getResourceAsStream("/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhacorrendo.gif")) {
+            if (stream != null) {
+                iconeCoracaoAranha.setImage(new Image(stream));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-             for (String ext : extensoes) {
+        try (java.io.InputStream stream = getClass().getResourceAsStream("/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png")) {
+            if (stream != null) {
+                imgPeterIcone.setImage(new Image(stream));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-                 String caminho =
-                     "/com/mycompany/entreSombrasETeias/jogo/imagens/"
-                     + nomeBase
-                     + "-tela-de-vilao"
-                     + ext;
+        int indiceVetor = episodioResolvido - 1;
+        if (indiceVetor < 0) indiceVetor = 0;
+        if (indiceVetor >= DIALOGOS.length) indiceVetor = DIALOGOS.length - 1;
 
-                 stream = getClass().getResourceAsStream(caminho);
+        dialogoAtual = DIALOGOS[indiceVetor];
 
-                 if (stream != null)
-                     break;
-             }
+        setBotoesAcaoBloqueados(true);
+        iconeCoracaoAranha.setVisible(false);
+        painelBalaoVilao.setVisible(false);
+        imgVilao.setVisible(true);
+        labelStatusTurno.setText("");
 
-             if (stream != null && imgVilao != null) {
+        atualizarDialogo();
+        atualizarUI();
+        configurarControleTeclado();
 
-                 try {
-
-                     imgVilao.setImage(new Image(stream));
-                     stream.close();
-
-                 } catch (Exception e) {
-                     e.printStackTrace();
-                 }
-
-             }
-
-         }
-
-         try (java.io.InputStream stream =
-                 getClass().getResourceAsStream(
-                         "/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhacorrendo.gif")) {
-
-             if (stream != null) {
-                 iconeCoracaoAranha.setImage(new Image(stream));
-             }
-
-         } catch (Exception e) {
-             e.printStackTrace();
-         }
-
-         try (java.io.InputStream stream =
-                 getClass().getResourceAsStream(
-                         "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png")) {
-
-             if (stream != null) {
-                 imgPeterIcone.setImage(new Image(stream));
-             }
-
-         } catch (Exception e) {
-             e.printStackTrace();
-         }
-
-         int indiceVetor = ep - 1;
-
-         if (indiceVetor < 0)
-             indiceVetor = 0;
-
-         if (indiceVetor >= DIALOGOS.length)
-             indiceVetor = DIALOGOS.length - 1;
-
-         dialogoAtual = DIALOGOS[indiceVetor];
-
-         setBotoesAcaoBloqueados(true);
-
-         iconeCoracaoAranha.setVisible(false);
-
-         painelBalaoVilao.setVisible(false);
-
-         imgVilao.setVisible(true);
-
-         labelStatusTurno.setText("");
-
-         atualizarDialogo();
-
-         atualizarUI();
-
-         // Configura o teclado uma única vez
-         configurarControleTeclado();
-
-         // Dá foco quando a tela terminar de carregar
-         javafx.application.Platform.runLater(() -> {
-             caixaCombateUndertale.requestFocus();
-         });
-
-     } //fim do initialize
+        javafx.application.Platform.runLater(() -> {
+            caixaCombateUndertale.requestFocus();
+        });
+    }
 
     @FXML
     public void avancarDialogo() {
@@ -221,79 +199,38 @@ public class GameplayController implements Initializable {
             if (painelBotoesLuta != null) painelBotoesLuta.setVisible(true);
             if (iconeCoracaoAranha != null) iconeCoracaoAranha.setVisible(true); 
             
-            
             iniciarTurnoJogador();
         }
     }
 
-    // 2. SISTEMA DE CONTROLE POR SETAS COM TRAVA DE BORDA INTERNA (HITBOX)
-   private void configurarControleTeclado() {
+    private void configurarControleTeclado() {
+        caixaCombateUndertale.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene == null) return;
 
-    caixaCombateUndertale.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            newScene.setOnKeyPressed(evento -> {
+                switch (evento.getCode()) {
+                    case UP:    cima = true; break;
+                    case DOWN:  baixo = true; break;
+                    case LEFT:  esquerda = true; break;
+                    case RIGHT: direita = true; break;
+                    default: break;
+                }
+            });
 
-        if (newScene == null) {
-            return;
-        }
+            newScene.setOnKeyReleased(evento -> {
+                switch (evento.getCode()) {
+                    case UP:    cima = false; break;
+                    case DOWN:  baixo = false; break;
+                    case LEFT:  esquerda = false; break;
+                    case RIGHT: direita = false; break;
+                    default: break;
+                }
+            });
 
-        newScene.setOnKeyPressed(evento -> {
-
-            switch (evento.getCode()) {
-
-                case UP:
-                    cima = true;
-                    break;
-
-                case DOWN:
-                    baixo = true;
-                    break;
-
-                case LEFT:
-                    esquerda = true;
-                    break;
-
-                case RIGHT:
-                    direita = true;
-                    break;
-
-                default:
-                    break;
-            }
-
+            caixaCombateUndertale.requestFocus();
         });
-
-        newScene.setOnKeyReleased(evento -> {
-
-            switch (evento.getCode()) {
-
-                case UP:
-                    cima = false;
-                    break;
-
-                case DOWN:
-                    baixo = false;
-                    break;
-
-                case LEFT:
-                    esquerda = false;
-                    break;
-
-                case RIGHT:
-                    direita = false;
-                    break;
-
-                default:
-                    break;
-            }
-
-        });
-
-        caixaCombateUndertale.requestFocus();
-
-    });
-
-}// fim do configurar teclado
-   
-   
+    }
+    
     private void iniciarTurnoJogador() {
         turnoDoJogador = true;
         if (labelStatusTurno != null) {
@@ -319,99 +256,94 @@ public class GameplayController implements Initializable {
         delay.play();
     }
 
-private void iniciarTurnoInimigo() {
-    turnoDoJogador = false;
-    caixaCombateUndertale.requestFocus();
-    jaLevouDanoNesteTurno = false;
+    private void iniciarTurnoInimigo() {
+        turnoDoJogador = false;
+        caixaCombateUndertale.requestFocus();
+        jaLevouDanoNesteTurno = false;
 
-    if (labelStatusTurno != null) labelStatusTurno.setVisible(false);
+        if (labelStatusTurno != null) labelStatusTurno.setVisible(false);
 
-    String[] habilidadesVilao;
-    switch (jogador.getNivelAtual()) {
-        case 1: habilidadesVilao = new String[]{"Mergulho vertical", "Passagem lateral", "Rajada simples"}; break;
-        case 2: habilidadesVilao = new String[]{"Ondas horizontais", "Explosão central", "Sequência de pulsos"}; break;
-        case 3: habilidadesVilao = new String[]{"Salto aleatório", "Corrida horizontal", "Cauda em arco"}; break;
-        case 4: habilidadesVilao = new String[]{"Raios verticais", "Laser horizontal", "Grade elétrica"}; break;
-        case 5: habilidadesVilao = new String[]{"Tentáculos laterais", "Ataque simultâneo", "Zona bloqueada"}; break;
-        case 6: habilidadesVilao = new String[]{"Bombas com atraso", "Investida diagonal", "Caos aleatório"}; break;
-        default: habilidadesVilao = new String[]{"Mergulho vertical"};
-    }
+        String[] habilidadesVilao;
+        // CORREÇÃO: Lê baseado no episódio resolvido da luta atual e não na conta persistida do jogador
+        switch (episodioResolvido) {
+            case 1: habilidadesVilao = new String[]{"Mergulho vertical", "Passagem lateral", "Rajada simples"}; break;
+            case 2: habilidadesVilao = new String[]{"Ondas horizontais", "Explosão central", "Sequência de pulsos"}; break;
+            case 3: habilidadesVilao = new String[]{"Salto aleatório", "Corrida horizontal", "Cauda em arco"}; break;
+            case 4: habilidadesVilao = new String[]{"Raios verticais", "Laser horizontal", "Grade elétrica"}; break;
+            case 5: habilidadesVilao = new String[]{"Tentáculos laterais", "Ataque simultâneo", "Zona bloqueada"}; break;
+            case 6: habilidadesVilao = new String[]{"Bombas com atraso", "Investida diagonal", "Caos aleatório"}; break;
+            default: habilidadesVilao = new String[]{"Mergulho vertical"};
+        }
 
-    int indexAleatorio = new java.util.Random().nextInt(habilidadesVilao.length);
-    String ataqueSorteado = habilidadesVilao[indexAleatorio];
+        int indexAleatorio = new java.util.Random().nextInt(habilidadesVilao.length);
+        String ataqueSorteado = habilidadesVilao[indexAleatorio];
 
-    // Evita ler 0 ou nulo se a tela ainda estiver renderizando
-    double larguraCaixa = caixaCombateUndertale.getPrefWidth() > 0 ? caixaCombateUndertale.getPrefWidth() : 480.0;
-    double alturaCaixa = caixaCombateUndertale.getPrefHeight() > 0 ? caixaCombateUndertale.getPrefHeight() : 140.0;
-    
-    double xSorteado = 50 + new java.util.Random().nextInt((int)larguraCaixa - 100);
+        double larguraCaixa = caixaCombateUndertale.getPrefWidth() > 0 ? caixaCombateUndertale.getPrefWidth() : 480.0;
+        double alturaCaixa = caixaCombateUndertale.getPrefHeight() > 0 ? caixaCombateUndertale.getPrefHeight() : 140.0;
+        
+        double xSorteado = 50 + new java.util.Random().nextInt((int)larguraCaixa - 100);
 
-    obstaculoAtaque = new AtaqueVisual(ataqueSorteado, larguraCaixa, alturaCaixa, xSorteado);
-    caixaCombateUndertale.getChildren().add(obstaculoAtaque.getFormatoVisual());
+        obstaculoAtaque = new AtaqueVisual(ataqueSorteado, larguraCaixa, alturaCaixa, xSorteado);
+        caixaCombateUndertale.getChildren().add(obstaculoAtaque.getFormatoVisual());
 
-    loopBatalha = new AnimationTimer() {
-        @Override
-        public void handle(long agora) {
-            // Movimento do Homem-Aranha
-            double velocidade = 4;
+        loopBatalha = new AnimationTimer() {
+            @Override
+            public void handle(long agora) {
+                double velocidade = 4;
 
-            double x = iconeCoracaoAranha.getLayoutX();
-            double y = iconeCoracaoAranha.getLayoutY();
+                double x = iconeCoracaoAranha.getLayoutX();
+                double y = iconeCoracaoAranha.getLayoutY();
 
-            double largura = iconeCoracaoAranha.getBoundsInParent().getWidth();
-            double altura = iconeCoracaoAranha.getBoundsInParent().getHeight();
+                double largura = iconeCoracaoAranha.getBoundsInParent().getWidth();
+                double altura = iconeCoracaoAranha.getBoundsInParent().getHeight();
 
-            if (cima && y > 0) {
-                iconeCoracaoAranha.setLayoutY(y - velocidade);
-            }
-
-            if (baixo && y < caixaCombateUndertale.getHeight() - altura) {
-                iconeCoracaoAranha.setLayoutY(y + velocidade);
-            }
-
-            if (esquerda && x > 0) {
-                iconeCoracaoAranha.setLayoutX(x - velocidade);
-                iconeCoracaoAranha.setScaleX(-1);
-            }
-
-            if (direita && x < caixaCombateUndertale.getWidth() - largura) {
-                iconeCoracaoAranha.setLayoutX(x + velocidade);
-                iconeCoracaoAranha.setScaleX(1);
-            }
-
-            // Atualiza o ataque
-            if (obstaculoAtaque != null) {
-                obstaculoAtaque.atualizarMecanica();
-
-                // Colisão
-                if (!jaLevouDanoNesteTurno &&
-                    obstaculoAtaque.getFormatoVisual().getBoundsInParent()
-                        .intersects(iconeCoracaoAranha.getBoundsInParent())) {
-
-                    jaLevouDanoNesteTurno = true;
-                    int danoVilao = 15 + (jogador.getNivelAtual() * 2);
-                    jogador.setHpAtual(Math.max(0, jogador.getHpAtual() - danoVilao));
-                    atualizarUI();
-                    verificarDerrota();
+                if (cima && y > 0) {
+                    iconeCoracaoAranha.setLayoutY(y - velocidade);
                 }
 
-                // Remove o ataque quando terminar
-                if (obstaculoAtaque.deveSerDestruido()) {
-                    caixaCombateUndertale.getChildren().remove(obstaculoAtaque.getFormatoVisual());
-                    obstaculoAtaque = null;
-                    stop(); // Para o timer atual de forma segura
+                if (baixo && y < caixaCombateUndertale.getHeight() - altura) {
+                    iconeCoracaoAranha.setLayoutY(y + velocidade);
+                }
 
-                    if (jogador.getHpAtual() > 0) {
-                        iniciarTurnoJogador();
+                if (esquerda && x > 0) {
+                    iconeCoracaoAranha.setLayoutX(x - velocidade);
+                    iconeCoracaoAranha.setScaleX(-1);
+                }
+
+                if (direita && x < caixaCombateUndertale.getWidth() - largura) {
+                    iconeCoracaoAranha.setLayoutX(x + velocidade);
+                    iconeCoracaoAranha.setScaleX(1);
+                }
+
+                if (obstaculoAtaque != null) {
+                    obstaculoAtaque.atualizarMecanica();
+
+                    if (!jaLevouDanoNesteTurno &&
+                        obstaculoAtaque.getFormatoVisual().getBoundsInParent()
+                            .intersects(iconeCoracaoAranha.getBoundsInParent())) {
+
+                        jaLevouDanoNesteTurno = true;
+                        int danoVilao = 15 + (episodioResolvido * 2);
+                        jogador.setHpAtual(Math.max(0, jogador.getHpAtual() - danoVilao));
+                        atualizarUI();
+                        verificarDerrota();
+                    }
+
+                    if (obstaculoAtaque.deveSerDestruido()) {
+                        caixaCombateUndertale.getChildren().remove(obstaculoAtaque.getFormatoVisual());
+                        obstaculoAtaque = null;
+                        stop(); 
+
+                        if (jogador.getHpAtual() > 0) {
+                            iniciarTurnoJogador();
+                        }
                     }
                 }
             }
-        }
-    };
+        };
 
-    // APENAS UM START AQUI! O erro anterior chamava isso duas vezes seguidas
-    loopBatalha.start(); 
-}//fim do iniciarTurnoInimigo
+        loopBatalha.start(); 
+    }
 
     @FXML
     public void recuperar() {
@@ -433,14 +365,15 @@ private void iniciarTurnoInimigo() {
 
     private boolean verificarVitoria() {
         if (vilao.estaMorto()) {
-            int ep = jogador.getNivelAtual();
             jogador.adicionarXp(vilao.getXpRecompensa());
             jogador.adicionarMoedas(vilao.getXpRecompensa() / 10);
             try {
                 new JogadorDAO().atualizar(jogador);
-                if (ep < 6) {
-                    new FaseProgressoDAO().desbloquearEpisodio(jogador.getIdJogador(), ep + 1);
-                    jogador.setNivelAtual(ep + 1);
+                // Apenas avança o nível da campanha se ele ganhou do vilão equivalente ao nível atual dele
+                if (episodioResolvido == jogador.getNivelAtual() && episodioResolvido < 6) {
+                    new FaseProgressoDAO().desbloquearEpisodio(jogador.getIdJogador(), episodioResolvido + 1);
+                    jogador.setNivelAtual(episodioResolvido + 1);
+                    new JogadorDAO().atualizar(jogador);
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();

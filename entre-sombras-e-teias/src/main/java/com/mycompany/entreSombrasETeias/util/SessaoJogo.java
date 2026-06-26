@@ -5,6 +5,7 @@ import com.mycompany.entreSombrasETeias.model.Jogador;
 public class SessaoJogo {
     private static SessaoJogo instancia;
     private Jogador jogadorAtual;
+    private String vilaoAtual; // Guarda o vilão selecionado na Teia de Confrontos
 
     // Construtor privado correto para garantir o Singleton
     private SessaoJogo() {
@@ -26,6 +27,15 @@ public class SessaoJogo {
         this.jogadorAtual = j; 
     }
     
+    // GETTER E SETTER DO VILÃO SELECIONADO
+    public String getVilaoAtual() {
+        return vilaoAtual;
+    }
+
+    public void setVilaoAtual(String vilao) {
+        this.vilaoAtual = vilao;
+    }
+    
     /**
      * Limpa os dados da sessão atual.
      * Essencial para quando o jogador volta ao menu principal 
@@ -33,5 +43,6 @@ public class SessaoJogo {
      */
     public void encerrarSessao() {
         this.jogadorAtual = null;
+        this.vilaoAtual = null; // Limpa o vilão guardado ao fechar a sessão
     }
 }
