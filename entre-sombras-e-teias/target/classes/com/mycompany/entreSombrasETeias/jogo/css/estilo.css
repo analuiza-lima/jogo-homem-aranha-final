@@ -1,39 +1,13 @@
-.titulo-menu {
-    -fx-text-fill: #ffffff; /* Mudei para branco para destacar no fundo escuro, mude se quiser */
-    -fx-font-family: "Courier New";
-    -fx-font-weight: bold;
-    -fx-font-size: 36px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 0); /* Sombra para dar efeito retro */
-}
+/* ==========================================================================
+   CONFIGURAÇÕES GLOBAIS E TELA JOGAR
+   ========================================================================== */
 
-.botao-menu {
-    -fx-font-family: "Courier New";
-    -fx-font-weight: bold;
-    -fx-font-size: 22px; /* Aumentei um pouco a fonte também para acompanhar o tamanho */
-    -fx-background-color: #ff2222;
-    -fx-text-fill: white;
-    -fx-background-radius: 0;
-    -fx-border-color: #000000;
-    -fx-border-width: 2px;
-    -fx-cursor: hand;
-    
-    /* MODIFICAÇÕES DE TAMANHO: */
-    -fx-min-width: 260px;       /* Botões mais largos (era 220px) */
-    -fx-padding: 20px 40px;     /* Botões mais altos e gordinhos (era 12px 20px) */
-}
-
-.botao-menu:hover {
-    -fx-background-color: #cc1111;
-    -fx-text-fill: #e0e0e0;
-}
-
-/* Estilos retrô globais (já definidos anteriormente) */
-.titulo-galeria {
-    -fx-text-fill: white;
-    -fx-font-family: 'Courier New';
-    -fx-font-weight: bold;
-    -fx-font-size: 26px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 0);
+/* Fundo inteligente: se adapta perfeitamente em qualquer tamanho de janela sem cortar */
+.tela-jogar-container {
+    -fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg');
+    -fx-background-size: 100% 100%; 
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
 }
 
 /* Novo Estilo para a Imagem de Fundo (Simula Painel de Quadrinhos) */
@@ -41,54 +15,85 @@
     -fx-border-color: black;
     -fx-border-width: 5px;
     -fx-border-style: solid;
-    -fx-background-color: transparent; /* Permite que a imagem apareça */
-    -fx-opacity: 1.0; /* Garante visibilidade total */
+    -fx-background-color: transparent;
+    -fx-opacity: 1.0;
 }
 
-/* Estilo para o Livro e o Grid */
-.livro-exibicao {
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+/* ==========================================================================
+   MENU PRINCIPAL (FAIXA SÓLIDA RETRÔ & TEIAS)
+   ========================================================================== */
+
+/* Faixa Superior Totalmente Sólida (Sem o fundo do aranha vazar por trás) */
+.barra-topo-solid {
+    -fx-background-color: #ff2211; 
+    -fx-border-color: black;
+    -fx-border-width: 0 0 4px 0; /* Linha preta grossa bem definida embaixo */
 }
 
-/* O contêiner interno do Livro deve alinhar o Grid perfeitamente */
-.grid-galeria {
-    -fx-alignment: CENTER; /* Centraliza o conteúdo dentro do livro */
-    -fx-padding: 30px; /* Dá espaço para as bordas do livro */
+/* Inserção das Teias nos cantos da faixa (Invertidas e transparentes) */
+.teias-decorativas {
+    -fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/teia-canto.png'); 
+    -fx-background-position: left top, right top;
+    -fx-background-repeat: no-repeat, no-repeat;
+    -fx-background-size: contain;
+    -fx-opacity: 0.45; /* Opacidade perfeita para não sumir com o texto */
 }
 
-/* Estilo Retrô de Botões de Navegação (Preto com borda vermelha) */
-.botao-navegacao {
-    -fx-background-color: black;
-    -fx-text-fill: white;
-    -fx-font-size: 20px;
+.titulo-menu {
+    -fx-text-fill: #ffffff; 
+    -fx-font-family: "Courier New";
     -fx-font-weight: bold;
-    -fx-font-family: 'Press Start 2P', 'Courier New', monospace;
-    -fx-cursor: hand;
-    -fx-background-radius: 0; /* Bordas quadradas */
-    -fx-border-color: #ff2222;
-    -fx-border-width: 2px;
+    -fx-font-size: 36px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 0);
 }
 
-.botao-navegacao:hover {
-    -fx-background-color: #333;
-    -fx-border-color: #ff5555;
-}
-
-.botao-navegacao:disabled {
-    -fx-opacity: 0.5;
-}
-
-/* Reutilizando e ajustando o estilo do botão VOLTAR */
-.botao-menu.botao-voltar {
-    -fx-background-radius: 0; /* Bordas quadradas */
+.botao-menu {
+    -fx-font-family: "Courier New";
+    -fx-font-weight: bold;
+    -fx-font-size: 22px; 
     -fx-background-color: #ff2222;
     -fx-text-fill: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 5, 0, 0, 2);
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-cursor: hand;
+    -fx-min-width: 260px;       
+    -fx-padding: 20px 40px;     
 }
 
-.botao-menu.botao-voltar:hover {
+.botao-menu:hover {
     -fx-background-color: #cc1111;
+    -fx-text-fill: #e0e0e0;
 }
+
+/* ==========================================================================
+   BOTÕES DA TELA JOGAR (ESTILO WIREFRAME ORIGINAL COMPACTADO)
+   ========================================================================== */
+
+/* Os botões vermelhos grandes do seu wireframe usando fonte nativa estável */
+.botao-retro-pixel {
+    -fx-background-color: #ff2211;
+    -fx-text-fill: black;
+    -fx-font-family: 'Courier New';
+    -fx-font-size: 24px; /* Tamanho ajustado para fonte monoespaçada ler bem */
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px; /* Mantém os cantos perfeitamente arredondados do print */
+    -fx-border-radius: 12px;
+    -fx-border-color: black;
+    -fx-border-width: 4px; /* Borda de impacto estilo arcade/Hq */
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 0, 0, 6, 6); /* Sombra em bloco rígido */
+}
+
+.botao-retro-pixel:hover {
+    -fx-background-color: #e61100;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.9), 0, 0, 3, 3);
+}
+
+/* ==========================================================================
+   TELA DA GALERIA / ÁLBUM DE CONQUISTAS
+   ========================================================================== */
 
 .titulo-galeria {
     -fx-text-fill: white;
@@ -98,38 +103,59 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.9), 6, 0, 0, 0);
 }
 
-/* Setas pretas com borda vermelha */
+.livro-exibicao {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+.grid-galeria {
+    -fx-alignment: CENTER; 
+    -fx-padding: 30px; 
+}
+
+/* Setas pretas transparentes com borda vermelha da navegação do livro */
 .botao-navegacao {
     -fx-background-color: rgba(0, 0, 0, 0.8);
     -fx-text-fill: white;
     -fx-font-size: 20px;
     -fx-font-weight: bold;
+    -fx-font-family: 'Courier New', monospace;
     -fx-cursor: hand;
     -fx-background-radius: 0; 
     -fx-border-color: #ff2222;
     -fx-border-width: 2px;
 }
+
 .botao-navegacao:hover {
     -fx-background-color: #ff2222;
     -fx-border-color: black;
 }
+
 .botao-navegacao:disabled {
     -fx-opacity: 0.3;
 }
 
-/* Voltar Retrô Quadrado */
-.botao-voltar-retro {
-    -fx-background-color: #ff2222;
+/* ==========================================================================
+   BOTÕES DE VOLTAR (PADRONIZADOS)
+   ========================================================================== */
+
+/* Vincula tanto a herança antiga quanto os novos botões voltar */
+.botao-voltar-retro,
+.botao-voltar-pixel,
+.botao-menu.botao-voltar {
+    -fx-background-color: #ff2211;
     -fx-text-fill: white;
     -fx-font-family: 'Courier New';
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-background-radius: 0;
+    -fx-background-radius: 0; /* Voltar rígido e totalmente quadrado nos cantos */
     -fx-border-color: black;
     -fx-border-width: 2px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 5, 0, 0, 2);
 }
-.botao-voltar-retro:hover {
+
+.botao-voltar-retro:hover,
+.botao-voltar-pixel:hover,
+.botao-menu.botao-voltar:hover {
     -fx-background-color: #cc1111;
 }

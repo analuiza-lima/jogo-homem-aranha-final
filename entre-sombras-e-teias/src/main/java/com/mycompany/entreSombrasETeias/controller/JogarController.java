@@ -24,4 +24,10 @@ public class JogarController {
         // Atualizado com o caminho completo do seu projeto Maven
         SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/teiadeconfrontos.fxml");
     }
+    
+    @FXML
+    public void voltarMenu() {
+        // Faz o botão voltar para o menu principal usando o SceneManager seguro
+        SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
+    }
 }

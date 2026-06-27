@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.control.Button?>
 <?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.mycompany.entreSombrasETeias.controller.JogarController"
-            prefWidth="800" prefHeight="600"
-            style="-fx-background-image: url('com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center; -fx-font-family: 'Press Start 2P';">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="tela-jogar-container" xmlns="http://javafx.com/javafx/13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.JogarController">
     
     <stylesheets>
         <URL value="@../css/estilo.css" />
     </stylesheets>
 
     <Button fx:id="btnModoHistoria" 
-            text="modo historia" 
+            mnemonicParsing="false" 
             onAction="#handleModoHistoria" 
-            prefHeight="76.0" prefWidth="168.0" 
+            prefHeight="130.0" prefWidth="300.0" 
+            styleClass="botao-retro-pixel" 
+            text="modo historia" 
             textAlignment="CENTER" wrapText="true"
-            style="-fx-background-color: #ff2211; -fx-text-fill: black; -fx-font-family: 'Press Start 2P'; -fx-font-size: 11px; -fx-background-radius: 10; -fx-border-color: black; -fx-border-width: 2; -fx-border-radius: 10; -fx-cursor: hand;" 
-            AnchorPane.topAnchor="64.0" 
+            AnchorPane.topAnchor="60.0" 
             AnchorPane.leftAnchor="60.0" />
 
     <Button fx:id="btnTeiaConfrontos" 
-            text="Teia de Confrontos" 
+            mnemonicParsing="false" 
             onAction="#handleTeiaConfrontos" 
-            prefHeight="76.0" prefWidth="168.0" 
+            prefHeight="130.0" prefWidth="300.0" 
+            styleClass="botao-retro-pixel" 
+            text="Teia de Confrontos" 
             textAlignment="CENTER" wrapText="true"
-            style="-fx-background-color: #ff2211; -fx-text-fill: black; -fx-font-family: 'Press Start 2P'; -fx-font-size: 11px; -fx-background-radius: 10; -fx-border-color: black; -fx-border-width: 2; -fx-border-radius: 10; -fx-cursor: hand;" 
-            AnchorPane.bottomAnchor="64.0" 
-            AnchorPane.rightAnchor="51.0" />
+            AnchorPane.bottomAnchor="60.0" 
+            AnchorPane.rightAnchor="60.0" />
+
+    <Button mnemonicParsing="false" 
+            onAction="#voltarMenu" 
+            prefHeight="50.0" prefWidth="150.0" 
+            styleClass="botao-voltar-pixel" 
+            text="VOLTAR"
+            AnchorPane.bottomAnchor="30.0" 
+            AnchorPane.leftAnchor="30.0" />
 
 </AnchorPane>
