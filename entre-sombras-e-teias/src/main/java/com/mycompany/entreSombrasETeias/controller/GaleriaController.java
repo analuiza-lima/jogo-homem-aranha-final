@@ -85,7 +85,7 @@ public class GaleriaController implements Initializable {
                 painelItem.getChildren().add(imgExibicao);
             } else {
                 // Se está bloqueado, renderiza diretamente a imagem customizada de bloqueio
-                String caminhoCadeado = "/com/mycompany/entreSombrasETeias/jogo/imagens/imagembloqueada.jpg";
+                String caminhoCadeado = "/com/mycompany/entreSombrasETeias/jogo/imagens/imagembloqueada.png";
                 try (InputStream isCadeado = getClass().getResourceAsStream(caminhoCadeado)) {
                     if (isCadeado != null) {
                         imgExibicao.setImage(new Image(isCadeado));

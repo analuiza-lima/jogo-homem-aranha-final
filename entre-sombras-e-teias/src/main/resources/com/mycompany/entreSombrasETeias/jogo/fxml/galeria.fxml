@@ -34,7 +34,7 @@
                     <children>
                         <ImageView fitHeight="420.0" fitWidth="720.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="/com/mycompany/entreSombrasETeias/jogo/imagens/galeria.jpg" />
+                                <Image url="/com/mycompany/entreSombrasETeias/jogo/imagens/galeria.png" />
                             </image>
                         </ImageView>
 
