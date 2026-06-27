@@ -1,126 +1,573 @@
-<?xml version="1.0" encoding="UTF-8"?>
+package com.mycompany.entreSombrasETeias.controller;
 
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
+import com.mycompany.entreSombrasETeias.dao.FaseProgressoDAO;
+import com.mycompany.entreSombrasETeias.dao.JogadorDAO;
+import com.mycompany.entreSombrasETeias.dao.VilaoDAO;
+import com.mycompany.entreSombrasETeias.model.Jogador;
+import com.mycompany.entreSombrasETeias.model.Vilao;
+import com.mycompany.entreSombrasETeias.util.SceneManager;
+import com.mycompany.entreSombrasETeias.util.SessaoJogo;
+import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
-<StackPane style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.GameplayController">
-   <children>
-      <AnchorPane prefHeight="650.0" prefWidth="850.0" style="-fx-background-color: black; -fx-font-family: 'Press Start 2P';">
-         <children>
-            
-            <ImageView fitHeight="420.0" pickOnBounds="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <image>
-                  <Image url="/com/mycompany/entreSombrasETeias/jogo/imagens/gotham-city.png" />
-               </image>
-            </ImageView>
-            
-            <VBox alignment="CENTER" spacing="10.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="15.0">
-               <children>
-                  <Label fx:id="labelVilaoNome" style="-fx-text-fill: #ff2211; -fx-font-size: 16px; -fx-font-weight: bold;" text="DUENDE VERDE" />
-                  
-                  <ProgressBar fx:id="barraHpVilao" prefHeight="22.0" prefWidth="300.0" progress="0.7" style="-fx-accent: #ff2211; -fx-border-color: black; -fx-border-width: 3;" />
-                  
-                  <StackPane fx:id="containerVilao" prefHeight="260.0" prefWidth="300.0">
-                     <children>
-                        <ImageView fx:id="imgVilao" fitHeight="260.0" fitWidth="260.0" pickOnBounds="true" preserveRatio="true" />
-                        
-                        <Label fx:id="labelDanoPopup" style="-fx-text-fill: #ff2211; -fx-font-size: 32px; -fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, black, 4, 0, 0, 0);" text="40" visible="false" StackPane.alignment="CENTER" />
-                     </children>
-                  </StackPane>
-               </children>
-            </VBox>
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.ResourceBundle;
 
-            <AnchorPane fx:id="painelBalaoVilao" layoutX="580.0" layoutY="80.0" prefHeight="90.0" prefWidth="230.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: black; -fx-border-width: 4;" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="80.0">
-               <children>
-                  <Label fx:id="labelDialogoVilao" alignment="TOP_LEFT" layoutX="15.0" layoutY="15.0" prefHeight="60.0" prefWidth="200.0" style="-fx-text-fill: black; -fx-font-size: 11px; -fx-wrap-text: true;" text="HAHAHA! O que você vai fazer?" />
-               </children>
-            </AnchorPane>
-            
-            <AnchorPane fx:id="caixaCombateUndertale" focusTraversable="true" layoutX="100.0" layoutY="310.0" prefHeight="140.0" prefWidth="650.0" style="-fx-background-color: black; -fx-border-color: white; -fx-border-width: 5;" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
-               <children>
-                  <Label fx:id="labelStatusTurno" alignment="TOP_LEFT" layoutX="25.0" layoutY="20.0" prefHeight="100.0" prefWidth="600.0" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-wrap-text: true;" text="* Duende Verde te atacou! O que você vai fazer?" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
-                  <ImageView fx:id="iconeCoracaoAranha" fitHeight="24.0" fitWidth="24.0" layoutX="30.0" layoutY="58.0" pickOnBounds="true" preserveRatio="true" visible="false" />
-                  
-                  <AnchorPane fx:id="painelMinigameAtaque" prefHeight="130.0" prefWidth="640.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Region layoutX="316.0" layoutY="10.0" prefHeight="110.0" prefWidth="8.0" style="-fx-background-color: #00ff00; -fx-border-color: white; -fx-border-width: 1;" AnchorPane.bottomAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                        <Region layoutX="250.0" layoutY="10.0" prefHeight="110.0" prefWidth="4.0" style="-fx-background-color: #ffd700;" AnchorPane.bottomAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                        <Region layoutX="386.0" layoutY="10.0" prefHeight="110.0" prefWidth="4.0" style="-fx-background-color: #ffd700;" AnchorPane.bottomAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                        
-                        <Region fx:id="barraMarcadorRitmo" layoutX="20.0" layoutY="8.0" prefHeight="114.0" prefWidth="12.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.8), 5, 0, 0, 0);" />
-                     </children>
-                  </AnchorPane>
-               </children>
-            </AnchorPane>
-            
-            <HBox alignment="CENTER_LEFT" layoutX="100.0" layoutY="460.0" prefWidth="650.0" spacing="15.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
-               <children>
-                  <Label fx:id="labelHpJogador" style="-fx-text-fill: white; -fx-font-size: 14px;" text="HP: 50/100" />
-                  <ProgressBar fx:id="barraHpJogador" prefHeight="18.0" prefWidth="200.0" progress="0.5" style="-fx-accent: #ff2211; -fx-border-color: white; -fx-border-width: 1;" />
-                  <Label fx:id="labelLvlJogador" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 0 0 0 30px;" text="LVL: 6" />
-                  <Label fx:id="labelSuperStatus" style="-fx-text-fill: #ffd700; -fx-font-size: 11px; -fx-padding: 0 0 0 20px;" text="SUPER: 0/120" />
-               </children>
-            </HBox>
-            
-            <AnchorPane prefHeight="145.0" prefWidth="800.0" style="-fx-background-color: #cccccc; -fx-border-color: black; -fx-border-width: 5 0 0 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-               <children>
-                  
-                  <HBox alignment="CENTER" layoutX="25.0" layoutY="18.0" prefHeight="105.0" prefWidth="105.0" style="-fx-background-color: black; -fx-border-color: black; -fx-border-width: 2;">
-                     <children>
-                        <ImageView fx:id="imgPeterIcone" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
-                  
-                  <AnchorPane fx:id="painelBalaoPeter" layoutX="150.0" layoutY="10.0" prefHeight="125.0" prefWidth="680.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="15.0">
-                     <children>
-                        <Label fx:id="labelDialogoPeter" alignment="TOP_LEFT" layoutX="10.0" layoutY="15.0" prefHeight="60.0" prefWidth="640.0" style="-fx-text-fill: black; -fx-font-size: 13px; -fx-font-weight: bold; -fx-wrap-text: true;" text="Duende verde..." AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
-                        <Button fx:id="btnAvancarDialogo" layoutX="500.0" layoutY="75.0" onAction="#avancarDialogo" prefHeight="35.0" prefWidth="150.0" style="-fx-background-color: #cccccc; -fx-text-fill: black; -fx-font-family: 'Press Start 2P'; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 0; -fx-border-color: black; -fx-border-width: 3; -fx-cursor: hand;" text="PRÓXIMO &gt;" AnchorPane.rightAnchor="10.0" />
-                     </children>
-                  </AnchorPane>
-                  
-                  <HBox fx:id="painelBotoesLuta" alignment="CENTER" layoutX="150.0" layoutY="40.0" spacing="20.0" visible="false" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="15.0">
-                     <children>
-                        <Button fx:id="btnAtacarAranha" onAction="#mostrarOpcoesAtaque" prefHeight="65.0" prefWidth="200.0" style="-fx-background-color: #cccccc; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand;" text="ATACAR |" />
-                        <Button fx:id="btnRecuperar" onAction="#mostrarOpcoesRecuperar" prefHeight="65.0" prefWidth="200.0" style="-fx-background-color: #cccccc; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand;" text="RECUPERAR" />
-                        <Button fx:id="btnFugir" onAction="#executarFugir" prefHeight="65.0" prefWidth="200.0" style="-fx-background-color: #cccccc; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 13px; -fx-font-weight: bold; -fx-cursor: hand;" text="FUGIR |" />
-                     </children>
-                  </HBox>
+public class GameplayController implements Initializable {
 
-                  <HBox fx:id="painelSubAtaques" alignment="CENTER" layoutX="150.0" layoutY="40.0" spacing="20.0" visible="false" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="15.0">
-                     <children>
-                        <Button fx:id="btnAtaqueOnda" onAction="#iniciarMinigameOnda" prefHeight="65.0" prefWidth="240.0" style="-fx-background-color: #cccccc; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand;" text="🕷️ ONDA ARANHAS" />
-                        <Button fx:id="btnAtaqueSuper" onAction="#iniciarMinigameSuper" prefHeight="65.0" prefWidth="240.0" style="-fx-background-color: #cccccc; -fx-text-fill: #888888; -fx-border-color: #888888; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand;" text="🕸️ SUPER TEIA" />
-                        <Button onAction="#voltarParaMenuLuta" prefHeight="65.0" prefWidth="130.0" style="-fx-background-color: #ff2211; -fx-text-fill: white; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand;" text="VOLTAR" />
-                     </children>
-                  </HBox>
+    @FXML private Label labelVilaoNome;
+    @FXML private Label labelHpJogador;
+    @FXML private Label labelLvlJogador;
+    @FXML private Label labelStatusTurno;
+    @FXML private Label labelDialogoVilao;
+    @FXML private Label labelDialogoPeter;
+    @FXML private Label labelSuperStatus;
+    @FXML private Label labelDanoPopup;
+    
+    @FXML private ImageView iconeCoracaoAranha;
+    @FXML private ProgressBar barraHpJogador;
+    @FXML private ProgressBar barraHpVilao;
+    @FXML private ImageView imgVilao;
+    @FXML private ImageView imgPeterIcone; 
+    
+    @FXML private StackPane containerVilao;
+    @FXML private AnchorPane painelBalaoVilao;
+    @FXML private AnchorPane painelBalaoPeter;
+    @FXML private AnchorPane caixaCombateUndertale;
+    @FXML private AnchorPane painelMinigameAtaque;
+    @FXML private Region barraMarcadorRitmo;
+    
+    @FXML private HBox painelBotoesLuta;
+    @FXML private HBox painelSubAtaques;
+    @FXML private HBox painelSubRecuperar;
+    @FXML private VBox telaGameOver;
 
-                  <HBox fx:id="painelSubRecuperar" alignment="CENTER" layoutX="150.0" layoutY="40.0" spacing="20.0" visible="false" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="15.0">
-                     <children>
-                        <Button fx:id="btnSentidoAranha" onAction="#usarSentidoAranha" prefHeight="65.0" prefWidth="240.0" style="-fx-background-color: #cccccc; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand;" text="⚡ SENTIDO ARANHA" />
-                        <Button fx:id="btnSuplemento" onAction="#usarSuplemento" prefHeight="65.0" prefWidth="240.0" style="-fx-background-color: #cccccc; -fx-text-fill: black; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand;" text="🥤 SUPLEMENTO" />
-                        <Button onAction="#voltarParaMenuLuta" prefHeight="65.0" prefWidth="130.0" style="-fx-background-color: #ff2211; -fx-text-fill: white; -fx-border-color: black; -fx-border-width: 4; -fx-background-radius: 0; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand;" text="VOLTAR" />
-                     </children>
-                  </HBox>
-                  
-               </children>
-            </AnchorPane>
-            
-            <VBox fx:id="telaGameOver" alignment="CENTER" spacing="30.0" style="-fx-background-color: rgba(0,0,0,0.95);" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <Label style="-fx-text-fill: #ff2211; -fx-font-size: 40px; -fx-font-weight: bold;" text="GAME OVER" />
-                  <Button onAction="#voltarMenuInicial" prefHeight="50.0" prefWidth="280.0" style="-fx-background-color: black; -fx-text-fill: white; -fx-border-color: white; -fx-border-width: 3; -fx-background-radius: 0; -fx-font-size: 14px; -fx-cursor: hand;" text="VOLTAR AO MENU" />
-               </children>
-            </VBox>
+    @FXML private Button btnAtacarAranha;  
+    @FXML private Button btnRecuperar;     
+    @FXML private Button btnFugir;         
+    @FXML private Button btnAvancarDialogo; 
+    @FXML private Button btnAtaqueSuper;
+    @FXML private Button btnSuplemento;
 
-         </children>
-      </AnchorPane>
-   </children>
-</StackPane>
+    private Jogador jogador;
+    private Vilao vilao;
+    private boolean turnoDoJogador = true;
+
+    private AnimationTimer loopBatalha;
+    private AnimationTimer loopMinigame;
+    private boolean jaLevouDanoNesteTurno = false;
+    
+    private boolean cima, baixo, esquerda, direita;
+    private double posicaoMarcador = 20.0;
+    private boolean indoParaDireita = true;
+    private int superAcumulado = 0;
+    private String tipoAtaqueAtual = "ONDA";
+
+    private int episodioResolvido = 1;
+    private int quantidadeSuplementos = 3; // Limite de inventário configurável
+
+    private List<javafx.scene.Node> elementosAtaqueAtivos = new ArrayList<>();
+    private Random random = new Random();
+
+    private static final String[][] DIALOGOS = {
+        { "PETER: Ei, senhor… isso não é horário de voo autorizado.", "VILAO: Eu voo quando quiser, garoto.", "PETER: Não se eu puder impedir!" },
+        { "VILAO: Hoje eu termino o que comecei, Homem-Aranha!", "PETER: Você começou alguma coisa?", "PETER: Cara, você fala isso toda vez…" },
+        { "PETER: Dr. Connors, você precisa lutar contra isso!", "VILAO: CONNORS NÃO EXISTE MAIS!", "PETER: Eu sei que ele ainda tá aí." },
+        { "VILAO: Olha só… finalmente você está prestando atenção em mim.", "PETER: Difícil ignorar quando você tá fritando a cidade.", "PETER: Pode vir com tudo!" }
+    };
+
+    private int indiceDialogo = 0;
+    private String[] dialogoAtual;
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        jogador = SessaoJogo.get().getJogador();
+        String vilaoLogado = SessaoJogo.get().getVilaoAtual();
+        
+        if (vilaoLogado != null && !vilaoLogado.isEmpty()) {
+            switch (vilaoLogado.toLowerCase()) {
+                case "abutre":   episodioResolvido = 1; break;
+                case "shocker":  episodioResolvido = 2; break;
+                case "lagarto":  episodioResolvido = 3; break;
+                case "electro":  episodioResolvido = 4; break;
+                default:         episodioResolvido = 1; break;
+            }
+        } else {
+            episodioResolvido = (jogador != null) ? jogador.getNivelAtual() : 1;
+        }
+
+        try {
+            vilao = new VilaoDAO().buscarPorEpisodio(episodioResolvido);
+        } catch (SQLException e) {
+            vilao = new Vilao();
+            vilao.setHpMaximo(100);
+            vilao.setHpAtual(100);
+            vilao.setNome(vilaoLogado != null ? vilaoLogado.toUpperCase() : "VILÃO");
+        }
+
+        if (labelVilaoNome != null) labelVilaoNome.setText(vilao.getNome());
+        
+        carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhacorrendo.gif");
+        carregarImagemComponente(imgPeterIcone, "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png");
+
+        int indiceVetor = Math.max(0, Math.min(episodioResolvido - 1, DIALOGOS.length - 1));
+        dialogoAtual = DIALOGOS[indiceVetor];
+
+        setBotoesAcaoBloqueados(true);
+        atualizarDialogo();
+        atualizarUI();
+        configurarControleTeclado();
+    }
+
+    private void carregarImagemComponente(ImageView iv, String path) {
+        try {
+            URL url = getClass().getResource(path);
+            if (url != null && iv != null) iv.setImage(new Image(url.toExternalForm()));
+        } catch (Exception e) {
+            System.out.println("Recurso não encontrado: " + path);
+        }
+    }
+
+    private void atualizarUI() {
+        if (jogador == null) return;
+        
+        // CORREÇÃO: Sincroniza dinamicamente o valor máximo atualizado do jogador
+        int hpMax = jogador.getHpMaximo() > 0 ? jogador.getHpMaximo() : 100;
+        labelHpJogador.setText("HP: " + jogador.getHpAtual() + "/" + hpMax);
+        barraHpJogador.setProgress((double) jogador.getHpAtual() / hpMax);
+        labelLvlJogador.setText("LVL: " + jogador.getNivelAtual());
+        labelSuperStatus.setText("SUPER: " + superAcumulado + "/120");
+        
+        if (vilao != null) {
+            barraHpVilao.setProgress((double) vilao.getHpAtual() / vilao.getHpMaximo());
+        }
+
+        // Regra do Inventário de Suplemento por Fase
+        if (episodioResolvido == 1) {
+            btnSuplemento.setDisable(true);
+            btnSuplemento.setText("🥤 BLOQUEADO");
+        } else {
+            btnSuplemento.setText("🥤 SUPLEMENTO (" + quantidadeSuplementos + ")");
+            btnSuplemento.setDisable(quantidadeSuplementos <= 0);
+        }
+    }
+
+    @FXML
+    public void avancarDialogo() {
+        indiceDialogo++;
+        atualizarDialogo();
+    }
+
+    private void atualizarDialogo() {
+        if (dialogoAtual == null) return;
+        if (indiceDialogo < dialogoAtual.length) {
+            String falaCompleta = dialogoAtual[indiceDialogo];
+            if (falaCompleta.startsWith("PETER:")) {
+                painelBalaoVilao.setVisible(false);
+                painelBalaoPeter.setVisible(true);
+                labelDialogoPeter.setText(falaCompleta);
+            } else {
+                painelBalaoPeter.setVisible(true);
+                labelDialogoPeter.setText("...");
+                painelBalaoVilao.setVisible(true);
+                labelDialogoVilao.setText(falaCompleta.replace("VILAO:", vilao.getNome() + ":"));
+            }
+        } else {
+            painelBalaoPeter.setVisible(false);
+            painelBalaoVilao.setVisible(false);
+            iniciarTurnoJogador();
+        }
+    }
+
+    private void iniciarTurnoJogador() {
+        turnoDoJogador = true;
+        alternarMenusSubinferiores(painelBotoesLuta);
+        labelStatusTurno.setVisible(true);
+        labelStatusTurno.setText("⭐ O que o Aranha vai fazer?");
+        setBotoesAcaoBloqueados(false);
+        caixaCombateUndertale.requestFocus();
+    }
+
+    private void alternarMenusSubinferiores(HBox painelAlvo) {
+        painelBotoesLuta.setVisible(painelAlvo == painelBotoesLuta);
+        painelSubAtaques.setVisible(painelAlvo == painelSubAtaques);
+        painelSubRecuperar.setVisible(painelAlvo == painelSubRecuperar);
+    }
+
+    @FXML private void mostrarOpcoesAtaque() { alternarMenusSubinferiores(painelSubAtaques); }
+    @FXML private void mostrarOpcoesRecuperar() { alternarMenusSubinferiores(painelSubRecuperar); }
+    @FXML public void voltarParaMenuLuta() { alternarMenusSubinferiores(painelBotoesLuta); }
+
+    @FXML
+    private void iniciarMinigameOnda() {
+        tipoAtaqueAtual = "ONDA";
+        dispararLoopRitmo();
+    }
+
+    @FXML
+    private void iniciarMinigameSuper() {
+        if (superAcumulado >= 120) {
+            tipoAtaqueAtual = "SUPER";
+            dispararLoopRitmo();
+        }
+    }
+
+    private void dispararLoopRitmo() {
+        labelStatusTurno.setVisible(false);
+        painelMinigameAtaque.setVisible(true);
+        setBotoesAcaoBloqueados(true);
+        painelSubAtaques.setVisible(false);
+        
+        posicaoMarcador = 20.0;
+        indoParaDireita = true;
+
+        loopMinigame = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                double velocidadeMovel = 9.0;
+                if (indoParaDireita) {
+                    posicaoMarcador += velocidadeMovel;
+                    if (posicaoMarcador >= 615) indoParaDireita = false;
+                } else {
+                    posicaoMarcador -= velocidadeMovel;
+                    if (posicaoMarcador <= 20) indoParaDireita = true;
+                }
+                barraMarcadorRitmo.setLayoutX(posicaoMarcador);
+            }
+        };
+        loopMinigame.start();
+    }
+
+    private void configurarControleTeclado() {
+        caixaCombateUndertale.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene == null) return;
+            newScene.setOnKeyPressed(evento -> {
+                switch (evento.getCode()) {
+                    case UP:    cima = true; break;
+                    case DOWN:  baixo = true; break;
+                    case LEFT:  esquerda = true; break;
+                    case RIGHT: direita = true; break;
+                    case SPACE:
+                    case ENTER:
+                        if (painelMinigameAtaque.isVisible()) computarDanoRitmo();
+                        break;
+                }
+            });
+            newScene.setOnKeyReleased(evento -> {
+                switch (evento.getCode()) {
+                    case UP:    cima = false; break;
+                    case DOWN:  baixo = false; break;
+                    case LEFT:  esquerda = false; break;
+                    case RIGHT: direita = false; break;
+                }
+            });
+        });
+    }
+
+    private void computarDanoRitmo() {
+        loopMinigame.stop();
+        painelMinigameAtaque.setVisible(false);
+        labelStatusTurno.setVisible(true);
+
+        double centroAlvo = 312.0;
+        double margemErro = Math.abs(posicaoMarcador - centroAlvo);
+        int danoFinal = 0;
+
+        if (margemErro <= 20.0) {
+            danoFinal = tipoAtaqueAtual.equals("SUPER") ? 75 : 35;
+            labelStatusTurno.setText("⭐ ACERTO PERFEITO RETRÔ!");
+            superAcumulado = 120;
+        } else if (margemErro <= 70.0) {
+            danoFinal = tipoAtaqueAtual.equals("SUPER") ? 45 : 20;
+            labelStatusTurno.setText("* Bom impacto! Causou " + danoFinal + " de dano.");
+            superAcumulado = tipoAtaqueAtual.equals("ONDA") ? Math.min(120, superAcumulado + 25) : 0;
+        } else {
+            labelStatusTurno.setText("* Você falhou no tempo!");
+            if (tipoAtaqueAtual.equals("SUPER")) superAcumulado = 0;
+        }
+
+        if (danoFinal > 0 && vilao != null) {
+            vilao.setHpAtual(Math.max(0, vilao.getHpAtual() - danoFinal));
+            animarDanoInimigo(danoFinal);
+        }
+
+        atualizarUI();
+        if (vilao != null && vilao.getHpAtual() <= 0) {
+            labelStatusTurno.setText("⭐ Vitória! O vilão foi derrotado.");
+            return;
+        }
+
+        Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> iniciarTurnoInimigo()));
+        delay.play();
+    }
+
+    private void animarDanoInimigo(int dano) {
+        labelDanoPopup.setText("-" + dano + " HP");
+        labelDanoPopup.setVisible(true);
+        TranslateTransition tt = new TranslateTransition(Duration.millis(50), containerVilao);
+        tt.setByX(10);
+        tt.setCycleCount(4);
+        tt.setAutoReverse(true);
+        tt.setOnFinished(e -> labelDanoPopup.setVisible(false));
+        tt.play();
+    }
+
+    @FXML
+    private void usarSentidoAranha() {
+        jogador.setHpAtual(Math.min(jogador.getHpMaximo(), jogador.getHpAtual() + 15));
+        labelStatusTurno.setText("* Sentido Aranha ativado! +15 HP.");
+        concluirAcaoSuporte();
+    }
+
+    @FXML
+    private void usarSuplemento() {
+        if (quantidadeSuplementos > 0 && episodioResolvido > 1) {
+            quantidadeSuplementos--;
+            jogador.setHpAtual(Math.min(jogador.getHpMaximo(), jogador.getHpAtual() + 35));
+            labelStatusTurno.setText("* Suplemento consumido! +35 HP.");
+            concluirAcaoSuporte();
+        }
+    }
+
+    private void concluirAcaoSuporte() {
+        atualizarUI();
+        alternarMenusSubinferiores(null);
+        Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> iniciarTurnoInimigo()));
+        delay.play();
+    }
+
+    private void iniciarTurnoInimigo() {
+        turnoDoJogador = false;
+        alternarMenusSubinferiores(null);
+        labelStatusTurno.setVisible(false);
+        iconeCoracaoAranha.setVisible(true);
+        iconeCoracaoAranha.setLayoutX(300);
+        iconeCoracaoAranha.setLayoutY(55);
+        jaLevouDanoNesteTurno = false;
+
+        // Limpa ataques antigos da hitbox antes de iniciar
+        caixaCombateUndertale.getChildren().removeAll(elementosAtaqueAtivos);
+        elementosAtaqueAtivos.clear();
+
+        executarAtaqueEspecificoVilao();
+    }
+
+    private void executarAtaqueEspecificoVilao() {
+        int tipoAtaque = random.nextInt(3) + 1;
+
+        loopBatalha = new AnimationTimer() {
+            private double tempoDecorrido = 0;
+
+            @Override
+            public void handle(long now) {
+                tempoDecorrido += 0.016; // Aproximadamente 1 frame a 60 FPS
+
+                // Atualiza movimentação do jogador dentro dos limites estritos do contêiner
+                double velocidadePlayer = 4.0;
+                if (cima && iconeCoracaoAranha.getLayoutY() > 10) iconeCoracaoAranha.setLayoutY(iconeCoracaoAranha.getLayoutY() - velocidadePlayer);
+                if (baixo && iconeCoracaoAranha.getLayoutY() < 100) iconeCoracaoAranha.setLayoutY(iconeCoracaoAranha.getLayoutY() + velocidadePlayer);
+                if (esquerda && iconeCoracaoAranha.getLayoutX() > 10) iconeCoracaoAranha.setLayoutX(iconeCoracaoAranha.getLayoutX() - velocidadePlayer);
+                if (direita && iconeCoracaoAranha.getLayoutX() < 600) iconeCoracaoAranha.setLayoutX(iconeCoracaoAranha.getLayoutX() + velocidadePlayer);
+
+                // GERAÇÃO E PROCESSAMENTO DOS ENGINES DE ATAQUE POR VILÃO
+                if (episodioResolvido == 1) { // ABUTRE
+                    processarAtaquesAbutre(tipoAtaque, tempoDecorrido);
+                } else if (episodioResolvido == 2) { // SHOCKER
+                    processarAtaquesShocker(tipoAtaque, tempoDecorrido);
+                } else if (episodioResolvido == 3) { // LAGARTO
+                    processarAtaquesLagarto(tipoAtaque, tempoDecorrido);
+                } else if (episodioResolvido == 4) { // ELECTRO
+                    processarAtaquesElectro(tipoAtaque, tempoDecorrido);
+                }
+
+                // Checagem de Colisão com barreira interna
+                verificarColisoesEImpacto();
+
+                if (tempoDecorrido >= 4.0) { // Fim do turno de defesa
+                    this.stop();
+                    finalizarTurnoDefensivo();
+                }
+            }
+        };
+        loopBatalha.start();
+    }
+
+    // --- ENGINES DOS COMPORTAMENTOS DOS VILÕES (PROCESSAMENTO INDIVIDUAL) ---
+
+    private void processarAtaquesAbutre(int tipo, double tempo) {
+        if (tempo < 0.05) {
+            if (tipo == 1) { // Mergulho Vertical
+                ImageView img = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-ataque.png", 60, 60);
+                img.setLayoutX(300); img.setLayoutY(-50);
+                adicionarObjetoAoPainel(img);
+            } else if (tipo == 2) { // Passagem Lateral
+                ImageView img = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-ataque2.png", 70, 50);
+                img.setLayoutX(-80); img.setLayoutY(50);
+                adicionarObjetoAoPainel(img);
+            }
+        }
+        
+        if (tipo == 3 && Math.random() < 0.03 && elementosAtaqueAtivos.size() < 3) { // Rajada Simples
+            Rectangle barra = new Rectangle(25, 8, Color.SILVER);
+            barra.setLayoutX(640); barra.setLayoutY(random.nextInt(100) + 10);
+            adicionarObjetoAoPainel(barra);
+        }
+
+        // Loops de Movimentação Real Nítida
+        for (javafx.scene.Node node : elementosAtaqueAtivos) {
+            if (tipo == 1) node.setLayoutY(node.getLayoutY() + 5);
+            else if (tipo == 2) node.setLayoutX(node.getLayoutX() + 6);
+            else node.setLayoutX(node.getLayoutX() - 4); // Rajada vindo da lateral
+        }
+    }
+
+    private void processarAtaquesShocker(int tipo, double tempo) {
+        if (tipo == 1 && Math.random() < 0.02) { // Ondas horizontais estilo Sans desviavel
+            Rectangle onda = new Rectangle(12, 40, Color.DEEPPINK);
+            onda.setLayoutX(640); onda.setLayoutY(random.nextBoolean() ? 15 : 75);
+            adicionarObjetoAoPainel(onda);
+        }
+        if (tipo == 2 && tempo < 0.05) { // Explosão Central Multi-localizada segura (Interna)
+            for (int i = 0; i < 3; i++) {
+                Circle exp = new Circle(4, Color.ORANGERED);
+                exp.setLayoutX(150 + (i * 160)); exp.setLayoutY(65);
+                adicionarObjetoAoPainel(exp);
+            }
+        }
+        if (tipo == 3 && Math.random() < 0.04 && elementosAtaqueAtivos.size() < 5) { // Pulsos Fixos
+            Circle pulso = new Circle(8, Color.YELLOW);
+            pulso.setLayoutX(random.nextInt(550) + 30); pulso.setLayoutY(random.nextInt(90) + 15);
+            adicionarObjetoAoPainel(pulso);
+        }
+
+        // Executa expansão segura controlada dentro da hitbox
+        for (javafx.scene.Node node : elementosAtaqueAtivos) {
+            if (node instanceof Circle) {
+                Circle c = (Circle) node;
+                if (tipo == 2 && c.getRadius() < 45) c.setRadius(c.getRadius() + 1.2);
+            } else {
+                node.setLayoutX(node.getLayoutX() - 5);
+            }
+        }
+    }
+
+    private void processarAtaquesLagarto(int tipo, double tempo) {
+        if (tipo == 1 && Math.random() < 0.02) { // Salto Aleatório (Gosma cai do teto)
+            ImageView gosma = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/gosma.png", 30, 30);
+            gosma.setLayoutX(random.nextInt(580) + 20); gosma.setLayoutY(-30);
+            adicionarObjetoAoPainel(gosma);
+        }
+        if (tipo == 2 && Math.random() < 0.03) { // Corrida Horizontal
+            ImageView corrida = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/gosma.png", 40, 20);
+            corrida.setLayoutX(-40); corrida.setLayoutY(iconeCoracaoAranha.getLayoutY());
+            adicionarObjetoAoPainel(corrida);
+        }
+        if (tipo == 3 && tempo < 0.05) { // Cauda em arco próximo do player
+            Rectangle arco = new Rectangle(100, 12, Color.LIMEGREEN);
+            arco.setLayoutX(250); arco.setLayoutY(60);
+            adicionarObjetoAoPainel(arco);
+        }
+
+        for (javafx.scene.Node node : elementosAtaqueAtivos) {
+            if (tipo == 1) node.setLayoutY(node.getLayoutY() + 4);
+            else if (tipo == 2) node.setLayoutX(node.getLayoutX() + 8);
+        }
+    }
+
+    private void processarAtaquesElectro(int tipo, double tempo) {
+        if (tipo == 1 && Math.random() < 0.03) { // Raios Verticais Esticados
+            Rectangle raio = new Rectangle(15, 120, Color.LIGHTCYAN);
+            raio.setLayoutX(random.nextInt(600)); raio.setLayoutY(0);
+            adicionarObjetoAoPainel(raio);
+        }
+        if (tipo == 2 && Math.random() < 0.02) { // Laser Horizontal Rápido
+            Rectangle laser = new Rectangle(140, 6, Color.AQUA);
+            laser.setLayoutX(640); laser.setLayoutY(random.nextInt(100) + 10);
+            adicionarObjetoAoPainel(laser);
+        }
+        if (tipo == 3 && tempo < 0.05) { // Grade Elétrica (Grid Fixado)
+            for (int i = 1; i < 4; i++) {
+                Rectangle linhaV = new Rectangle(4, 140, Color.YELLOW);
+                linhaV.setLayoutX(i * 150); linhaV.setLayoutY(0);
+                adicionarObjetoAoPainel(linhaV);
+            }
+        }
+
+        for (javafx.scene.Node node : elementosAtaqueAtivos) {
+            if (tipo == 2) node.setLayoutX(node.getLayoutX() - 9);
+        }
+    }
+
+    private ImageView criarProjetilImagem(String path, double w, double h) {
+        ImageView iv = new ImageView();
+        iv.setFitWidth(w); iv.setFitHeight(h);
+        carregarImagemComponente(iv, path);
+        return iv;
+    }
+
+    private void adicionarObjetoAoPainel(javafx.scene.Node node) {
+        elementosAtaqueAtivos.add(node);
+        caixaCombateUndertale.getChildren().add(node);
+    }
+
+    private void verificarColisoesEImpacto() {
+        for (javafx.scene.Node node : elementosAtaqueAtivos) {
+            if (node.getBoundsInParent().intersects(iconeCoracaoAranha.getBoundsInParent())) {
+                if (!jaLevouDanoNesteTurno) {
+                    jogador.setHpAtual(Math.max(0, jogador.getHpAtual() - 15));
+                    jaLevouDanoNesteTurno = true;
+                    atualizarUI();
+                    
+                    // Efeito Retro Visual de Dano Recebido
+                    iconeCoracaoAranha.setOpacity(0.3);
+                    Timeline piscar = new Timeline(new KeyFrame(Duration.seconds(0.3), e -> iconeCoracaoAranha.setOpacity(1.0)));
+                    piscar.play();
+                }
+            }
+        }
+    }
+
+    private void finalizarTurnoDefensivo() {
+        iconeCoracaoAranha.setVisible(false);
+        caixaCombateUndertale.getChildren().removeAll(elementosAtaqueAtivos);
+        elementosAtaqueAtivos.clear();
+
+        if (jogador.getHpAtual() <= 0) {
+            telaGameOver.setVisible(true);
+        } else {
+            iniciarTurnoJogador();
+        }
+    }
+
+    private void setBotoesAcaoBloqueados(boolean status) {
+        btnAtacarAranha.setDisable(status);
+        btnRecuperar.setDisable(status);
+        btnFugir.setDisable(status);
+    }
+
+    @FXML private void executarFugir() { SceneManager.mudarCena("/com/mycompany/entreSombrasETeias/jogo/visao/MenuInicial.fxml"); }
+    @FXML private void voltarMenuInicial() { SceneManager.mudarCena("/com/mycompany/entreSombrasETeias/jogo/visao/MenuInicial.fxml"); }
+}

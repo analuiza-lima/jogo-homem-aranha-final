@@ -42,11 +42,10 @@ public class UpgradesController implements Initializable {
     
     @FXML
     public void upgradeVelocidade() {
-        if (jogador.getMoedas() >= 60) {
-            jogador.setMoedas(jogador.getMoedas() - 60);
+      
             salvar();
             labelMensagem.setText("⚡ Velocidade aumentada!");
-        }
+        
         
         atualizarLabels();
     }
