@@ -427,7 +427,7 @@ public class GameplayController implements Initializable {
     @FXML
     private void usarSentidoAranha() {
         jogador.setHpAtual(Math.min(jogador.getHpMaximo(), jogador.getHpAtual() + 15));
-        labelStatusTurno.setText("* Sentido Aranha ativado! +15 HP.");
+        labelStatusTurno.setText("* Sentido Aranha ativado! Ataques do vilão agora estão mais lentos. +15 HP.");
         concluirAcaoSuporte();
     }
 
@@ -436,7 +436,7 @@ public class GameplayController implements Initializable {
         if (quantidadeSuplementos > 0 && episodioResolvido > 1) {
             quantidadeSuplementos--;
             jogador.setHpAtual(Math.min(jogador.getHpMaximo(), jogador.getHpAtual() + 35));
-            labelStatusTurno.setText("* Suplemento consumido! +35 HP.");
+            labelStatusTurno.setText("* Você consumiu o suplemento! Isso te enche de determinação. +35 HP.");
             concluirAcaoSuporte();
         }
     }
