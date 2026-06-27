@@ -11,8 +11,9 @@
             prefWidth="800" prefHeight="600"
             style="-fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center;">
 
-    <stylesheets>
-        <URL value="@style.css" /> </stylesheets>
+<stylesheets>
+        <URL value="@../css/estilo.css" />
+    </stylesheets>
 
     <HBox alignment="CENTER" style="-fx-background-color: rgba(230, 57, 70, 0.85); -fx-padding: 15;"
           AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">

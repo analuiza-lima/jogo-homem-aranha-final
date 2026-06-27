@@ -4,26 +4,28 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
+<?import java.net.URL?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.mycompany.entreSombrasETeias.controller.MenuController"
             prefWidth="800" prefHeight="600"
             style="-fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center;">
 
+<stylesheets>
+        <URL value="@../css/estilo.css" />
+    </stylesheets>
+
     <HBox alignment="CENTER" style="-fx-background-color: rgba(230, 57, 70, 0.85); -fx-padding: 15;"
           AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-        <Label text="Entre sombras e teias" 
-               style="-fx-text-fill: #000000; -fx-font-size: 32; -fx-font-family: 'Courier New'; -fx-font-weight: bold;"/>
+        <Label text="Entre sombras e teias" styleClass="titulo-menu"/>
     </HBox>
 
     <HBox alignment="CENTER" spacing="100" 
           AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
         
-        <Button text="imagens" onAction="#abrirGaleria" 
-                style="-fx-min-width: 150; -fx-font-size: 20; -fx-font-family: 'Courier New'; -fx-background-color: #ff2222; -fx-text-fill: black; -fx-background-radius: 5; -fx-cursor: hand;"/>
+        <Button text="imagens" onAction="#abrirGaleria" styleClass="botao-menu"/>
         
-        <Button text="jogar" onAction="#jogar" 
-                style="-fx-min-width: 150; -fx-font-size: 20; -fx-font-family: 'Courier New'; -fx-background-color: #ff2222; -fx-text-fill: black; -fx-background-radius: 5; -fx-cursor: hand;"/>
+        <Button text="jogar" onAction="#jogar" styleClass="botao-menu"/>
         
     </HBox>
 </AnchorPane>

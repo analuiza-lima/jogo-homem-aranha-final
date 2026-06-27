@@ -1,31 +1,20 @@
-/* Carrega a fonte customizada */
-@font-face {
-    font-family: 'Press Start 2P';
-    src: url('fonts/PressStart2P-Regular.ttf'); /* Ajuste o caminho relativo para o seu arquivo .ttf */
-}
-
-/* Estilo para o título */
 .titulo-menu {
     -fx-text-fill: #000000;
     -fx-font-family: 'Press Start 2P';
-    -fx-font-size: 24px; /* Fontes pixeladas costumam ser grandes, reduzi um pouco para testar */
+    -fx-font-size: 24px;
 }
 
-/* Estilo padrão para os botões do menu */
 .botao-menu {
     -fx-font-family: 'Press Start 2P';
-    -fx-font-size: 16px; /* Ajustado para a fonte pixelada */
+    -fx-font-size: 16px;
     -fx-background-color: #ff2222;
     -fx-text-fill: black;
     -fx-background-radius: 5;
     -fx-cursor: hand;
-    
-    /* É aqui que controlamos o tamanho do botão além do min-width */
     -fx-min-width: 200px;
-    -fx-padding: 15px 30px; /* Aumenta o espaço interno do botão (cima/baixo lados) */
+    -fx-padding: 15px 30px;
 }
 
-/* Efeito de hover (quando passa o mouse) para dar um charme */
 .botao-menu:hover {
     -fx-background-color: #cc1111;
 }
