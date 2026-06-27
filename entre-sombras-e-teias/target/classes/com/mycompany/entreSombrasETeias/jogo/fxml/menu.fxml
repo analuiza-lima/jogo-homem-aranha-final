@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
-<?import java.net.URL?>
+<?import javafx.scene.layout.StackPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.mycompany.entreSombrasETeias.controller.MenuController"
-            prefWidth="800" prefHeight="600"
-            style="-fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center;">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="tela-menu-container" xmlns="http://javafx.com/javafx/13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.MenuController">
 
-<stylesheets>
+    <stylesheets>
         <URL value="@../css/estilo.css" />
     </stylesheets>
 
-    <HBox alignment="CENTER" style="-fx-background-color: rgba(230, 57, 70, 0.85); -fx-padding: 15;"
-          AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-        <Label text="Entre sombras e teias" styleClass="titulo-menu"/>
+    <StackPane styleClass="barra-topo-solid" 
+               AnchorPane.topAnchor="0.0" 
+               AnchorPane.leftAnchor="0.0" 
+               AnchorPane.rightAnchor="0.0" 
+               prefHeight="85.0">
+        <children>
+            <AnchorPane styleClass="teias-decorativas" mouseTransparent="true" />
+            
+            <Label text="Entre sombras e teias" styleClass="titulo-menu" />
+        </children>
+    </StackPane>
+
+    <HBox alignment="CENTER" spacing="100.0" 
+          AnchorPane.bottomAnchor="50.0" 
+          AnchorPane.leftAnchor="20.0" 
+          AnchorPane.rightAnchor="20.0">
+        <children>
+            <Button onAction="#abrirGaleria" styleClass="botao-menu" text="imagens" />
+            <Button onAction="#jogar" styleClass="botao-menu" text="jogar" />
+        </children>
     </HBox>
 
-    <HBox alignment="CENTER" spacing="100" 
-          AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
-        
-        <Button text="imagens" onAction="#abrirGaleria" styleClass="botao-menu"/>
-        
-        <Button text="jogar" onAction="#jogar" styleClass="botao-menu"/>
-        
-    </HBox>
 </AnchorPane>

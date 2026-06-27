@@ -3,7 +3,8 @@
    ========================================================================== */
 
 /* Fundo inteligente: se adapta perfeitamente em qualquer tamanho de janela sem cortar */
-.tela-jogar-container {
+.tela-jogar-container,
+.tela-menu-container {
     -fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg');
     -fx-background-size: 100% 100%; 
     -fx-background-position: center;
@@ -20,14 +21,16 @@
 }
 
 /* ==========================================================================
-   MENU PRINCIPAL (FAIXA SÓLIDA RETRÔ & TEIAS)
+   MENU PRINCIPAL (FAIXA SÓLIDA RETRÔ DE PONTA A PONTA & TEIAS)
    ========================================================================== */
 
 /* Faixa Superior Totalmente Sólida (Sem o fundo do aranha vazar por trás) */
 .barra-topo-solid {
     -fx-background-color: #ff2211; 
+    -fx-opacity: 1.0;             
     -fx-border-color: black;
-    -fx-border-width: 0 0 4px 0; /* Linha preta grossa bem definida embaixo */
+    -fx-border-width: 0 0 5px 0; /* Linha preta bem grossa embaixo estilo HQ/Wireframe */
+    -fx-max-width: 20000px;      /* CORRIGIDO: Valor numérico real para o JavaFX aceitar */
 }
 
 /* Inserção das Teias nos cantos da faixa (Invertidas e transparentes) */
@@ -36,7 +39,8 @@
     -fx-background-position: left top, right top;
     -fx-background-repeat: no-repeat, no-repeat;
     -fx-background-size: contain;
-    -fx-opacity: 0.45; /* Opacidade perfeita para não sumir com o texto */
+    -fx-opacity: 0.55;           
+    -fx-max-width: 20000px;      /* CORRIGIDO: Valor numérico real para o JavaFX aceitar */
 }
 
 .titulo-menu {
@@ -67,22 +71,22 @@
 }
 
 /* ==========================================================================
-   BOTÕES DA TELA JOGAR (ESTILO WIREFRAME ORIGINAL COMPACTADO)
+   BOTÕES DA TELA JOGAR (ESTILO WIREFRAME ORIGINAL)
    ========================================================================== */
 
-/* Os botões vermelhos grandes do seu wireframe usando fonte nativa estável */
+/* Os botões vermelhos grandes usando fonte nativa estável Courier New */
 .botao-retro-pixel {
     -fx-background-color: #ff2211;
     -fx-text-fill: black;
     -fx-font-family: 'Courier New';
-    -fx-font-size: 24px; /* Tamanho ajustado para fonte monoespaçada ler bem */
+    -fx-font-size: 24px; 
     -fx-font-weight: bold;
-    -fx-background-radius: 12px; /* Mantém os cantos perfeitamente arredondados do print */
+    -fx-background-radius: 12px; 
     -fx-border-radius: 12px;
     -fx-border-color: black;
-    -fx-border-width: 4px; /* Borda de impacto estilo arcade/Hq */
+    -fx-border-width: 4px; 
     -fx-cursor: hand;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 0, 0, 6, 6); /* Sombra em bloco rígido */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 0, 0, 6, 6); 
 }
 
 .botao-retro-pixel:hover {
@@ -148,7 +152,7 @@
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-background-radius: 0; /* Voltar rígido e totalmente quadrado nos cantos */
+    -fx-background-radius: 0; 
     -fx-border-color: black;
     -fx-border-width: 2px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 5, 0, 0, 2);

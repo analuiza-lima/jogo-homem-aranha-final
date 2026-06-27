@@ -15,7 +15,7 @@
             onAction="#handleModoHistoria" 
             prefHeight="130.0" prefWidth="300.0" 
             styleClass="botao-retro-pixel" 
-            text="modo historia" 
+            text="Modo História" 
             textAlignment="CENTER" wrapText="true"
             AnchorPane.topAnchor="60.0" 
             AnchorPane.leftAnchor="60.0" />
