@@ -1,32 +1,36 @@
 package com.mycompany.entreSombrasETeias.model;
 
-
 public class Jogador {
     private int    idJogador;
     private String nome;
     private int    xpAtual;
     private int    hpAtual;
     private int    nivelAtual;
-    private int    moedas;
+
     public Jogador() {}
+
     public Jogador(String nome) {
-        this.nome      = nome;
+        this.nome       = nome;
         this.xpAtual   = 0;
-        this.hpAtual   = 100;
-        this.nivelAtual = 1;
-        this.moedas    = 0;
+        this.nivelAtual = 1;    
+        this.hpAtual   = getHpMaximo(); // Começa com o HP máximo do nível 1
     }
 
+    // Calcula o HP Máximo baseado no nível atual do Peter (100 base + 20 por nível)
+    public int getHpMaximo() {
+        return 100 + ((this.nivelAtual - 1) * 20);
+    }
     
     public void adicionarXp(int quantidade) {
         this.xpAtual += quantidade;
-    }
-
-    public void adicionarMoedas(int quantidade) {
-        this.moedas += quantidade; 
+        // Sistema simples de Level Up retroativo caso queira implementar futuramente
+        if (this.xpAtual >= this.nivelAtual * 100) {
+            this.nivelAtual++;
+            this.hpAtual = getHpMaximo(); // Cura completa ao subir de nível
+        }
     }
     
-        public void receberDano(int dano) {
+    public void receberDano(int dano) {
         this.hpAtual = Math.max(0, this.hpAtual - dano);
     }
 
@@ -63,7 +67,8 @@ public class Jogador {
     }
 
     public void setHpAtual(int hpAtual) {
-        this.hpAtual = hpAtual;
+        // Garante que o HP modificado externamente não passe do limite máximo permitido
+        this.hpAtual = Math.min(hpAtual, getHpMaximo());
     }
 
     public int getNivelAtual() {
@@ -73,14 +78,4 @@ public class Jogador {
     public void setNivelAtual(int nivelAtual) {
         this.nivelAtual = nivelAtual;
     }
-
-    public int getMoedas() {
-        return moedas;
-    }
-
-    public void setMoedas(int moedas) {
-        this.moedas = moedas;
-    }
-    
-    
 }

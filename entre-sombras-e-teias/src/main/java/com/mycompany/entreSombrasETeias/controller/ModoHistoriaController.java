@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
@@ -31,42 +32,67 @@ public class ModoHistoriaController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         Jogador j = SessaoJogo.get().getJogador();
         if (j == null) return;
-        labelNome.setText(j.getNome());
+        labelNome.setText(j.getNome().toUpperCase());
         labelXP.setText("XP: " + j.getXpAtual());
-        labelHP.setText("HP: " + j.getHpAtual());
+        labelHP.setText("HP: " + j.getHpAtual() + "/100");
         carregarFases(j.getIdJogador());
     }
     
-    private void carregarFases(int idJogador) {
-        try {
-            FaseProgressoDAO dao = new FaseProgressoDAO();
-            List<FaseProgresso> fases = dao.listarPorJogador(idJogador);
-            Button[] botoes = {btnEp1, btnEp2, btnEp3, btnEp4, btnEp5, btnEp6};
+private void carregarFases(int idJogador) {
+    try {
+        FaseProgressoDAO dao = new FaseProgressoDAO();
+        List<FaseProgresso> fases = dao.listarPorJogador(idJogador);
+        Button[] botoes = {btnEp1, btnEp2, btnEp3, btnEp4, btnEp5, btnEp6};
+        
+        // 1. Reset inicial: Configura tudo como bloqueado usando APENAS classes CSS
+        for (Button b : botoes) {
+            b.setDisable(true);
+            b.setText("🔒");
+            b.getStyleClass().removeAll("botao-historia-acao", "botao-historia-bloqueado");
+            b.getStyleClass().add("botao-historia-bloqueado");
             
-            // Força todos os estados iniciais limpos como segurança
-            for (Button b : botoes) {
-                b.setDisable(true);
-                b.setText("🔒");
-                b.setStyle("-fx-background-color: #444; -fx-text-fill: #888; -fx-font-size: 10px; -fx-pref-width: 110; -fx-pref-height: 40; -fx-font-family: 'Press Start 2P';");
+            VBox cardPai = (VBox) b.getParent();
+            if (cardPai != null) {
+                cardPai.getStyleClass().removeAll("card-episodio", "card-episodio-bloqueado");
+                cardPai.getStyleClass().add("card-episodio-bloqueado");
             }
+        }
 
-            for (FaseProgresso fp : fases) {
-                int idx = fp.getNumeroEpisodio() - 1;
-                if (idx >= 0 && idx < botoes.length) {
-                    Button btn = botoes[idx];
+        // 2. Desbloqueia os episódios que o jogador já liberou no banco
+        for (FaseProgresso fp : fases) {
+            int idx = fp.getNumeroEpisodio() - 1;
+            if (idx >= 0 && idx < botoes.length) {
+                Button btn = botoes[idx];
+                
+                if (!fp.isBloqueado()) {
+                    btn.setDisable(false);
+                    btn.setText("JOGAR");
                     
-                    if (!fp.isBloqueado()) {
-                        btn.setDisable(false);
-                        btn.setText("JOGAR");
-                        // Aplica dinamicamente a estilização vermelha e o cursor hand do wireframe para os desbloqueados
-                        btn.setStyle("-fx-background-color: #ff2211; -fx-text-fill: black; -fx-font-size: 10px; -fx-cursor: hand; -fx-pref-width: 110; -fx-pref-height: 40; -fx-font-family: 'Press Start 2P'; -fx-border-color: black; -fx-border-width: 1;");
+                    // Remove a classe de bloqueado e ativa a classe de ação (onde está o vermelho sólido)
+                    btn.getStyleClass().removeAll("botao-historia-bloqueado");
+                    if (!btn.getStyleClass().contains("botao-historia-acao")) {
+                        btn.getStyleClass().add("botao-historia-acao");
+                    }
+                    
+                    // Transforma o Card de cinza para o Vermelho do Wireframe
+                    VBox cardPai = (VBox) btn.getParent();
+                    if (cardPai != null) {
+                        cardPai.getStyleClass().removeAll("card-episodio-bloqueado");
+                        cardPai.getStyleClass().add("card-episodio");
+                        
+                        // Alterna o ícone interno para a aranha ativa
+                        if (!cardPai.getChildren().isEmpty() && cardPai.getChildren().size() > 1) {
+                            cardPai.getChildren().get(1).getStyleClass().removeAll("container-decorativo-teia");
+                            cardPai.getChildren().get(1).getStyleClass().add("container-decorativo-aranha");
+                        }
                     }
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+} //fim do carregar fases
 
     public void selecionarEpisodio(int ep) {
         episodioSelecionado = ep;
@@ -81,16 +107,7 @@ public class ModoHistoriaController implements Initializable {
     @FXML public void jogarEp5() { selecionarEpisodio(5); }
     @FXML public void jogarEp6() { selecionarEpisodio(6); }
 
-    @FXML public void abrirLoja() { 
-        SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/loja.fxml"); 
-    }
-    @FXML public void abrirUpgrades() { 
-        SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/upgrades.fxml"); 
-    }
-    @FXML public void abrirInventario(){
-        SceneManager.abrirNovoStage("/com/mycompany/entreSombrasETeias/jogo/fxml/inventario.fxml", "Inventário"); 
-    }
-    @FXML public void voltarMenu() { 
-        SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
-    }
+    @FXML public void abrirUpgrades() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/upgrades.fxml"); }
+    @FXML public void abrirInventario(){ SceneManager.abrirNovoStage("/com/mycompany/entreSombrasETeias/jogo/fxml/inventario.fxml", "Inventário"); }
+    @FXML public void voltarMenu() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml"); }
 }

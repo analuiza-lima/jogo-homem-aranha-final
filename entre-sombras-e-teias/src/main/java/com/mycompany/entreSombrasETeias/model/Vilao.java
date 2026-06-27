@@ -1,6 +1,5 @@
 package com.mycompany.entreSombrasETeias.model;
 
-
 public class Vilao {
     
     private int    idVilao;
@@ -18,10 +17,34 @@ public class Vilao {
         this.vidaAtual = Math.max(0, this.vidaAtual - dano);
     }
 
-    
     public boolean estaMorto() {
         return this.vidaAtual <= 0;
     }
+
+    // ==========================================
+    //   MÉTODOS DE COMPATIBILIDADE (GETTER/SETTER HP)
+    //   Evitam erros de compilação no GameplayController
+    // ==========================================
+    
+    public int getHpMaximo() {
+        return this.vidaMaxima;
+    }
+    
+    public void setHpMaximo(int hpMaximo) {
+        this.vidaMaxima = hpMaximo;
+    }
+    
+    public int getHpAtual() {
+        return this.vidaAtual;
+    }
+    
+    public void setHpAtual(int hpAtual) {
+        this.vidaAtual = Math.min(Math.max(0, hpAtual), this.vidaMaxima);
+    }
+
+    // ==========================================
+    //   GETTERS E SETTERS PADRÃO
+    // ==========================================
 
     public int getIdVilao() {
         return idVilao;
@@ -78,5 +101,4 @@ public class Vilao {
     public void setNumeroEpisodio(int numeroEpisodio) {
         this.numeroEpisodio = numeroEpisodio;
     }
-    
 }

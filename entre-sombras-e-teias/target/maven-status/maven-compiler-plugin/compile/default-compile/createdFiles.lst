@@ -17,6 +17,7 @@ com\mycompany\entreSombrasETeias\controller\UpgradesController.class
 com\mycompany\entreSombrasETeias\util\SessaoJogo.class
 com\mycompany\entreSombrasETeias\model\GaleriaImagem.class
 com\mycompany\entreSombrasETeias\dao\FaseProgressoDAO.class
+com\mycompany\entreSombrasETeias\controller\GameplayController$3.class
 com\mycompany\entreSombrasETeias\controller\CreditosController.class
 com\mycompany\entreSombrasETeias\controller\ModoHistoriaController.class
 com\mycompany\entreSombrasETeias\util\SceneManager.class
