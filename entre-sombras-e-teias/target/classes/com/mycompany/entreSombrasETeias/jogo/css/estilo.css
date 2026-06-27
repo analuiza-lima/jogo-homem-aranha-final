@@ -1,26 +1,29 @@
-/* Carrega a fonte customizada */
-@font-face {
-    font-family: 'Press Start 2P';
-    src: url('/com/mycompany/entreSombrasETeias/jogo/fonte/PressStart2P-Regular.ttf');
-}
-
 .titulo-menu {
-    -fx-text-fill: #000000;
-    -fx-font-family: 'Press Start 2P';
-    -fx-font-size: 24px;
+    -fx-text-fill: #ffffff; /* Mudei para branco para destacar no fundo escuro, mude se quiser */
+    -fx-font-family: "Courier New";
+    -fx-font-weight: bold;
+    -fx-font-size: 36px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 0); /* Sombra para dar efeito retro */
 }
 
 .botao-menu {
-    -fx-font-family: 'Press Start 2P';
-    -fx-font-size: 16px;
+    -fx-font-family: "Courier New";
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
     -fx-background-color: #ff2222;
-    -fx-text-fill: black;
-    -fx-background-radius: 5;
+    -fx-text-fill: white; /* Texto branco destaca mais em botões vermelhos */
+    -fx-background-radius: 0; /* Bordas quadradas dão um visual mais pixel/retro */
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
     -fx-cursor: hand;
-    -fx-min-width: 200px;
-    -fx-padding: 15px 30px;
+    
+    /* Tamanho do botão */
+    -fx-min-width: 220px;
+    -fx-padding: 12px 20px;
 }
 
+/* Efeito ao passar o mouse */
 .botao-menu:hover {
     -fx-background-color: #cc1111;
+    -fx-text-fill: #e0e0e0;
 }
