@@ -89,7 +89,7 @@ public class GameplayController implements Initializable {
 
     private List<javafx.scene.Node> elementosAtaqueAtivos = new ArrayList<>();
     private Random random = new Random();
-
+    
     // Matriz contendo o Contexto Narrativo seguido do Diálogo Obrigatório de cada chefe
     private static final String[][] NARRATIVAS_E_DIALOGOS = {
         // EPISÓDIO 1: ABUTRE
@@ -210,7 +210,9 @@ public class GameplayController implements Initializable {
         
         carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhacorrendo.gif");
         carregarImagemComponente(imgPeterIcone, "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png");
-
+        carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhacorrendo.gif");
+        carregarImagemComponente(imgPeterIcone, "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png");
+        
         int indiceVetor = Math.max(0, Math.min(episodioResolvido - 1, NARRATIVAS_E_DIALOGOS.length - 1));
         dialogoAtual = NARRATIVAS_E_DIALOGOS[indiceVetor];
 
@@ -218,8 +220,8 @@ public class GameplayController implements Initializable {
         atualizarDialogo();
         atualizarUI();
         configurarControleTeclado();
-    }
-
+    } // fim do initialize 
+    
     private void carregarImagemComponente(ImageView iv, String path) {
         try {
             URL url = getClass().getResource(path);
