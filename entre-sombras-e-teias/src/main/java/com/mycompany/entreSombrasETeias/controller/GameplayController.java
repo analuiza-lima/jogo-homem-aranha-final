@@ -390,7 +390,7 @@ public class GameplayController implements Initializable {
         });
     }
 
-    private void computarDanoRitmo() {
+private void computarDanoRitmo() {
         loopMinigame.stop();
         painelMinigameAtaque.setVisible(false);
         labelStatusTurno.setVisible(true);
@@ -402,7 +402,12 @@ public class GameplayController implements Initializable {
         if (margemErro <= 20.0) {
             danoFinal = tipoAtaqueAtual.equals("SUPER") ? 75 : 35;
             labelStatusTurno.setText("⭐ ACERTO PERFEITO!");
-            superAcumulado = 120;
+            // BUG CORRIGIDO: Se era um ataque normal ("ONDA"), acumula super. Se já era o SUPER, zera ou mantém.
+            if (tipoAtaqueAtual.equals("ONDA")) {
+                superAcumulado = Math.min(120, superAcumulado + 40); 
+            } else {
+                superAcumulado = 0; // Usou o super, gasta a barra
+            }
         } else if (margemErro <= 70.0) {
             danoFinal = tipoAtaqueAtual.equals("SUPER") ? 45 : 20;
             labelStatusTurno.setText("* Bom impacto! Causou " + danoFinal + " de dano.");
@@ -418,14 +423,43 @@ public class GameplayController implements Initializable {
         }
 
         atualizarUI();
+
+        // --- CÓDIGO DE VITÓRIA CORRIGIDO ---
         if (vilao != null && vilao.getHpAtual() <= 0) {
             labelStatusTurno.setText("⭐ Vitória! O vilão foi derrotado.");
-            return;
+            
+            // Cria um pequeno delay para o jogador ver a animação de dano antes de mudar de tela
+            Timeline vitoriaDelay = new Timeline(new KeyFrame(Duration.seconds(2.0), e -> {
+                // Troca para o menu ou tela de encerramento
+                SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
+            }));
+            vitoriaDelay.play();
+            return; // Sai do método e NÃO agenda o turno do inimigo
         }
 
+        // Só inicia o turno do inimigo se o vilão ainda estiver vivo
         Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> iniciarTurnoInimigo()));
         delay.play();
     }
+
+    private void animarDanoInimigo(int dano) {
+        labelDanoPopup.setText("-" + dano + " HP");
+        labelDanoPopup.setVisible(true);
+        
+        // HITBOX FIXADA: Em vez de mover o containerVilao inteiro (que mexe as hitboxes de lugar),
+        // nós movemos apenas o componente visual da imagem (imgVilao)!
+        if (imgVilao != null) {
+            TranslateTransition tt = new TranslateTransition(Duration.millis(50), imgVilao);
+            tt.setByX(10);
+            tt.setCycleCount(4);
+            tt.setAutoReverse(true);
+            tt.setOnFinished(e -> {
+                labelDanoPopup.setVisible(false);
+                imgVilao.setTranslateX(0); // Garante que a imagem volta à posição original perfeita
+            });
+            tt.play();
+        }
+    }//fim do computar dano 
 
     private void animarDanoInimigo(int dano) {
         labelDanoPopup.setText("-" + dano + " HP");
@@ -662,6 +696,6 @@ public class GameplayController implements Initializable {
         btnFugir.setDisable(status);
     }
 
-    @FXML private void executarFugir() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/gameover.fxml"); }
+    @FXML private void executarFugir() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/gameover.fxml"); }
     @FXML private void voltarMenuInicial() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/menu.fxml"); }
 }
