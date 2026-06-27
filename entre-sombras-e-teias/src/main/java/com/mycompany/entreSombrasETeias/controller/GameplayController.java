@@ -213,6 +213,18 @@ public class GameplayController implements Initializable {
         carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhacorrendo.gif");
         carregarImagemComponente(imgPeterIcone, "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png");
         
+        // === ADICIONE ESTE BLOCO NO FINAL DO INITIALIZE, APÓS CARREGARimgPeterIcone ===
+        if (episodioResolvido == 1) { // ABUTRE
+            // Carrega a pose ESTÁTICA/BASE de batalha do Abutre
+            carregarImagemComponente(imgVilao, "/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-tela-de-vilao.png");
+        } else if (episodioResolvido == 2) {
+          carregarImagemComponente(imgVilao, "/com/mycompany/entreSombrasETeias/jogo/imagens/shocker-tela-de-vilao.png");
+        }
+        else if (episodioResolvido == 3) {
+        carregarImagemComponente(imgVilao, "/com/mycompany/entreSombrasETeias/jogo/imagens/-tela-de-vilao.png");
+
+    }
+        // ============================================================================
         int indiceVetor = Math.max(0, Math.min(episodioResolvido - 1, NARRATIVAS_E_DIALOGOS.length - 1));
         dialogoAtual = NARRATIVAS_E_DIALOGOS[indiceVetor];
 
