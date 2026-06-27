@@ -27,18 +27,18 @@
     </top>
 
     <center>
-        <AnchorPane maxHeight="500.0" maxWidth="800.0" BorderPane.alignment="CENTER">
+        <AnchorPane maxHeight="520.0" maxWidth="800.0" BorderPane.alignment="CENTER">
             <children>
                 
-                <StackPane layoutX="40.0" layoutY="5.0" prefHeight="420.0" prefWidth="720.0" style="-fx-background-color: transparent;">
+                <StackPane layoutX="20.0" layoutY="5.0" prefHeight="440.0" prefWidth="760.0" style="-fx-background-color: transparent;">
                     <children>
-                        <ImageView fitHeight="420.0" fitWidth="720.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="440.0" fitWidth="760.0" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="/com/mycompany/entreSombrasETeias/jogo/imagens/galeria.png" />
                             </image>
                         </ImageView>
 
-                        <GridPane fx:id="gridGaleria" hgap="35.0" maxHeight="310.0" maxWidth="570.0" vgap="25.0">
+                        <GridPane fx:id="gridGaleria" hgap="20.0" vgap="15.0" maxHeight="280.0" maxWidth="520.0" style="-fx-padding: 0 10px 0 10px;">
                             <columnConstraints>
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -53,10 +53,10 @@
                     </children>
                 </StackPane>
 
-                <Button fx:id="btnAnterior" layoutX="5.0" layoutY="190.0" mnemonicParsing="false" onAction="#paginaAnterior" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&lt;" />
-                <Button fx:id="btnProximo" layoutX="755.0" layoutY="190.0" mnemonicParsing="false" onAction="#proximaPagina" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&gt;" />
+                <Button fx:id="btnAnterior" layoutX="5.0" layoutY="200.0" mnemonicParsing="false" onAction="#paginaAnterior" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&lt;" />
+                <Button fx:id="btnProximo" layoutX="755.0" layoutY="200.0" mnemonicParsing="false" onAction="#proximaPagina" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&gt;" />
                 
-                <Button layoutX="40.0" layoutY="440.0" mnemonicParsing="false" onAction="#voltarMenu" prefHeight="45.0" prefWidth="160.0" styleClass="botao-voltar-retro" text="VOLTAR" />
+                <Button layoutX="20.0" layoutY="455.0" mnemonicParsing="false" onAction="#voltarMenu" prefHeight="45.0" prefWidth="160.0" styleClass="botao-voltar-retro" text="VOLTAR" />
                 
             </children>
         </AnchorPane>
