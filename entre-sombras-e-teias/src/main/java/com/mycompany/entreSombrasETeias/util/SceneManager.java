@@ -16,7 +16,7 @@ public class SceneManager {
     }
 
     /**
-     * Troca a cena no stage principal.
+     * Troca a cena no stage principal sem perder o modo Tela Cheia (FullScreen).
      * @param fxmlPath caminho completo começando de resources, 
      * ex: "/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml"
      */
@@ -24,7 +24,6 @@ public class SceneManager {
         try {
             URL resource = SceneManager.class.getResource(fxmlPath);
             
-            // CORRIGIDO: Validação explícita para evitar NullPointerException mascarado
             if (resource == null) {
                 System.err.println("ERRO: O arquivo FXML não foi encontrado no caminho: " + fxmlPath);
                 return;
@@ -32,9 +31,29 @@ public class SceneManager {
 
             FXMLLoader loader = new FXMLLoader(resource);
             Parent root = loader.load();
-            Scene scene = new Scene(root);
             
-            stagePrincipal.setScene(scene);
+            // 1. Guarda se a tela principal já estava em modo FullScreen
+            boolean estavaEmFullScreen = stagePrincipal.isFullScreen();
+            
+            // 2. Tenta obter a Scene que já está ativa no Stage
+            Scene cenaAtual = stagePrincipal.getScene();
+            
+            if (cenaAtual == null) {
+                // Se for a primeira tela do jogo, cria uma nova Scene normalmente
+                Scene novaCena = new Scene(root);
+                stagePrincipal.setScene(novaCena);
+            } else {
+                // SE JÁ EXISTE UMA CENA: Mudamos apenas o conteúdo interno (root) dela.
+                // Isso evita que o JavaFX resete as propriedades da janela no sistema operacional!
+                cenaAtual.setRoot(root);
+            }
+            
+            // 3. Garante que o estado de Fullscreen seja mantido/reaplicado perfeitamente
+            if (estavaEmFullScreen) {
+                stagePrincipal.setFullScreen(false); // Pequeno reset para evitar bugs de foco do Windows
+                stagePrincipal.setFullScreen(true);
+            }
+            
             stagePrincipal.show();
         } catch (IOException e) {
             System.err.println("ERRO ao carregar a tela de destino: " + fxmlPath);
