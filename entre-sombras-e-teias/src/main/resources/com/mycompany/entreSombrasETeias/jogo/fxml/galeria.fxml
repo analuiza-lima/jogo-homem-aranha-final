@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import java.net.URL?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -11,54 +10,97 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.GaleriaController">
 
-<BorderPane minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.GaleriaController" style="-fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center;">
-    
-    <stylesheets>
-        <URL value="@../css/estilo.css" />
-    </stylesheets>
+    <children>
 
-    <top>
-        <StackPane prefHeight="80.0" BorderPane.alignment="CENTER">
-            <children>
-                <Label alignment="CENTER" styleClass="titulo-galeria" text="GALERIA DE IMAGENS / CONQUISTAS" />
-            </children>
-        </StackPane>
-    </top>
+        <BorderPane minHeight="600.0" minWidth="800.0" style="-fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center;">
 
-    <center>
-        <AnchorPane maxHeight="520.0" maxWidth="800.0" BorderPane.alignment="CENTER">
-            <children>
-                
-                <StackPane layoutX="20.0" layoutY="5.0" prefHeight="440.0" prefWidth="760.0" style="-fx-background-color: transparent;">
+            <stylesheets>
+                <URL value="@../css/estilo.css" />
+            </stylesheets>
+            <top>
+                <StackPane prefHeight="80.0" BorderPane.alignment="CENTER">
                     <children>
-                        <ImageView fitHeight="440.0" fitWidth="760.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image url="/com/mycompany/entreSombrasETeias/jogo/imagens/galeria.png" />
-                            </image>
-                        </ImageView>
+                        <Label alignment="CENTER" styleClass="titulo-galeria" text="GALERIA DE IMAGENS / CONQUISTAS" />
+                    </children>
+                </StackPane>
+            </top>
+            <center>
+                <AnchorPane maxHeight="520.0" maxWidth="800.0" BorderPane.alignment="CENTER">
+                    <children>
 
-                        <GridPane fx:id="gridGaleria" hgap="20.0" vgap="15.0" maxHeight="280.0" maxWidth="520.0" style="-fx-padding: 0 10px 0 10px;">
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            </columnConstraints>
-                            <rowConstraints>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            </rowConstraints>
-                        </GridPane>
+                        <StackPane layoutX="20.0" layoutY="5.0" prefHeight="440.0" prefWidth="760.0" style="-fx-background-color: transparent;">
+                            <children>
+                                <ImageView fitHeight="440.0" fitWidth="760.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="/com/mycompany/entreSombrasETeias/jogo/imagens/galeria.png" />
+                                    </image>
+                                </ImageView>
+                                <GridPane fx:id="gridGaleria" hgap="20.0" vgap="15.0" maxHeight="280.0" maxWidth="520.0" style="-fx-padding: 0 10px 0 10px;">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                </GridPane>
+                            </children>
+                        </StackPane>
+                        <Button fx:id="btnAnterior" layoutX="5.0" layoutY="200.0" mnemonicParsing="false" onAction="#paginaAnterior" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&lt;" />
+                        <Button fx:id="btnProximo" layoutX="755.0" layoutY="200.0" mnemonicParsing="false" onAction="#proximaPagina" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&gt;" />
+
+                        <Button layoutX="20.0" layoutY="455.0" mnemonicParsing="false" onAction="#voltarMenu" prefHeight="45.0" prefWidth="160.0" styleClass="botao-voltar-retro" text="VOLTAR" />
+
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+
+        <!-- ===================== OVERLAY: IMAGEM EM TELA CHEIA ===================== -->
+        <!-- Fica invisível por padrão. O Controller torna visível ao clicar numa
+             imagem desbloqueada e preenche imgFullscreen com a arte correspondente. -->
+        <StackPane fx:id="painelFullscreen"
+                    visible="false"
+                    style="-fx-background-color: rgba(0,0,0,0.88);"
+                    onMouseClicked="#fecharFullscreen">
+
+            <children>
+
+                <StackPane alignment="TOP_RIGHT" maxWidth="700.0" maxHeight="560.0">
+                    <children>
+
+                        <ImageView fx:id="imgFullscreen"
+                                   fitWidth="650.0"
+                                   fitHeight="520.0"
+                                   preserveRatio="true"
+                                   pickOnBounds="false" />
+
+                        <Button fx:id="btnFecharFullscreen"
+                                mnemonicParsing="false"
+                                onAction="#fecharFullscreen"
+                                styleClass="botao-voltar-retro"
+                                text="X"
+                                prefWidth="40.0"
+                                prefHeight="40.0"
+                                StackPane.alignment="TOP_RIGHT">
+                            <font>
+                                <Font name="Press Start 2P" size="12.0"/>
+                            </font>
+                        </Button>
+
                     </children>
                 </StackPane>
 
-                <Button fx:id="btnAnterior" layoutX="5.0" layoutY="200.0" mnemonicParsing="false" onAction="#paginaAnterior" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&lt;" />
-                <Button fx:id="btnProximo" layoutX="755.0" layoutY="200.0" mnemonicParsing="false" onAction="#proximaPagina" prefHeight="50.0" prefWidth="40.0" styleClass="botao-navegacao" text="&gt;" />
-                
-                <Button layoutX="20.0" layoutY="455.0" mnemonicParsing="false" onAction="#voltarMenu" prefHeight="45.0" prefWidth="160.0" styleClass="botao-voltar-retro" text="VOLTAR" />
-                
             </children>
-        </AnchorPane>
-    </center>
-</BorderPane>
+
+        </StackPane>
+
+    </children>
+
+</StackPane>

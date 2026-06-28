@@ -28,6 +28,12 @@ public class GaleriaController implements Initializable {
     @FXML
     private Button btnProximo;
 
+    // ===================== OVERLAY FULLSCREEN =====================
+    @FXML
+    private StackPane painelFullscreen;
+    @FXML
+    private ImageView imgFullscreen;
+
     private List<FaseProgresso> listaProgresso = new ArrayList<>();
     private int paginaAtual = 0;
     private final int ITENS_POR_PAGINA = 8; // Grid 4x2 por página conforme o Wireframe
@@ -87,25 +93,28 @@ public class GaleriaController implements Initializable {
                 // Se o boss foi realmente derrotado, carrega a arte da vitória correspondente
                 String arquivoImagem = obterNomeArquivoPorEpisodio(numEpisodio);
                 String caminhoArte = "/com/mycompany/entreSombrasETeias/jogo/imagens/" + arquivoImagem;
-                
-                try (InputStream is = getClass().getResourceAsStream(caminhoArte)) {
-                    if (is != null) {
-                        imgExibicao.setImage(new Image(is));
-                    }
-                } catch (Exception e) {
-                    System.out.println("Erro ao carregar a imagem de conquista: " + caminhoArte);
+
+                Image imagemConquista = carregarImagem(caminhoArte);
+                if (imagemConquista != null) {
+                    imgExibicao.setImage(imagemConquista);
                 }
+
+                // Só permite abrir o fullscreen se a imagem desbloqueada existir de fato
+                if (imagemConquista != null) {
+                    Image imagemParaFullscreen = imagemConquista;
+                    painelItem.setCursor(javafx.scene.Cursor.HAND);
+                    painelItem.setOnMouseClicked(e -> abrirFullscreen(imagemParaFullscreen));
+                }
+
                 painelItem.getChildren().add(imgExibicao);
             } else {
                 // Se o boss não foi derrotado ainda (fase bloqueada OU fase liberada para jogar mas não vencida), mostra o cadeado
                 String caminhoCadeado = "/com/mycompany/entreSombrasETeias/jogo/imagens/imagembloqueada.png";
-                try (InputStream isCadeado = getClass().getResourceAsStream(caminhoCadeado)) {
-                    if (isCadeado != null) {
-                        imgExibicao.setImage(new Image(isCadeado));
-                    }
-                } catch (Exception e) {
-                    System.out.println("Erro ao carregar o cadeado de micro-bloqueio.");
+                Image imagemCadeado = carregarImagem(caminhoCadeado);
+                if (imagemCadeado != null) {
+                    imgExibicao.setImage(imagemCadeado);
                 }
+                // Imagem bloqueada não abre fullscreen — sem onMouseClicked aqui de propósito.
                 painelItem.getChildren().add(imgExibicao);
             }
 
@@ -118,6 +127,21 @@ public class GaleriaController implements Initializable {
         // Atualiza a visibilidade das setas laterais de paginação do livro
         btnAnterior.setDisable(paginaAtual == 0);
         btnProximo.setDisable(fim >= listaProgresso.size());
+    }
+
+    /**
+     * Carrega uma imagem a partir do classpath, retornando null em caso de falha
+     * (mantendo o mesmo padrão de try/catch já usado no resto da classe).
+     */
+    private Image carregarImagem(String caminho) {
+        try (InputStream is = getClass().getResourceAsStream(caminho)) {
+            if (is != null) {
+                return new Image(is);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao carregar imagem: " + caminho);
+        }
+        return null;
     }
 
     /**
@@ -138,6 +162,25 @@ public class GaleriaController implements Initializable {
             default:
                 return "imagembloqueada.jpg";
         }
+    }
+
+    // ===================== OVERLAY FULLSCREEN =====================
+
+    /**
+     * Exibe a imagem desbloqueada em tela cheia, sobrepondo a galeria.
+     */
+    private void abrirFullscreen(Image imagem) {
+        imgFullscreen.setImage(imagem);
+        painelFullscreen.setVisible(true);
+    }
+
+    /**
+     * Fecha o overlay de tela cheia (botão "X" ou clique fora da imagem).
+     */
+    @FXML
+    public void fecharFullscreen() {
+        painelFullscreen.setVisible(false);
+        imgFullscreen.setImage(null);
     }
 
     @FXML

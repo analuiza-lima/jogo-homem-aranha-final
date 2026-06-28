@@ -107,45 +107,72 @@ public class GameplayController implements Initializable {
     private List<javafx.scene.Node> elementosAtaqueAtivos = new ArrayList<>();
     private Random random = new Random();
 
+    // Efeitos temporários que valem só para o PRÓXIMO turno do inimigo, consumidos
+    // (lidos e zerados) no início de executarAtaqueEspecificoVilao(). Sem essa leitura,
+    // as flags eram setadas mas nunca tinham efeito real no jogo - eram só cosméticas.
+    private boolean sentidoAranhaAtivoParaProximoTurno = false;
+    private boolean inimigoPresoNaTeiaNoProximoTurno = false;
+    // Multiplicadores efetivamente aplicados durante o turno em andamento (1.0 = normal).
+    private double multiplicadorVelocidadeInimigoNoTurno = 1.0;
+    private double multiplicadorDanoRecebidoNoTurno = 1.0;
+
+    private Timeline loopVenenoTimeline;
+
+    // BUG CORRIGIDO (pedido do usuário): random.nextInt(3)+1 puro podia, por sorte,
+    // repetir o mesmo tipo de ataque várias vezes seguidas ao longo de uma luta,
+    // dando a impressão de que o vilão só usava 2 dos 3 ataques disponíveis. Um
+    // "shuffle bag" garante que os 3 tipos apareçam todos antes de qualquer um repetir.
+    private List<Integer> sacoDeTiposDeAtaque = new ArrayList<>();
+
+    private int sortearProximoTipoDeAtaque() {
+        if (sacoDeTiposDeAtaque.isEmpty()) {
+            sacoDeTiposDeAtaque.add(1);
+            sacoDeTiposDeAtaque.add(2);
+            sacoDeTiposDeAtaque.add(3);
+            java.util.Collections.shuffle(sacoDeTiposDeAtaque, random);
+        }
+        return sacoDeTiposDeAtaque.remove(0);
+    }
+
     private static final String[][] NARRATIVAS_E_DIALOGOS = {
-        // EPISODIO 1: ABUTRE
+        // EPISÓDIO 1: ABUTRE
         {
-            "NARRATIVA: Em mais uma de suas patrulhas noturnas, Peter observava a cidade do alto dos predios.",
-            "NARRATIVA: Um vulto cruzou o ceu rapidamente, carregando algo pesado.",
-            "NARRATIVA: Peter se aproximou em silencio, tentando entender o que estava acontecendo.",
-            "NARRATIVA: As asas metalicas refletiram a luz da lua - definitivamente nao era um passaro.",
-            "NARRATIVA: Antes que pudesse reagir, a figura mergulhou em sua direcao.",
-            "PETER: Ei, senhor... isso nao e horario de voo autorizado.",
+            "NARRATIVA: Em mais uma de suas patrulhas noturnas, Peter observava a cidade do alto dos prédios.",
+            "NARRATIVA: Um vulto cruzou o céu rapidamente, carregando algo pesado.",
+            "NARRATIVA: Peter se aproximou em silêncio, tentando entender o que estava acontecendo.",
+            "NARRATIVA: As asas metálicas refletiram a luz da lua - definitivamente não era um pássaro.",
+            "NARRATIVA: Antes que pudesse reagir, a figura mergulhou em sua direção.",
+            "PETER: Ei, senhor... isso não é horário de voo autorizado.",
             "VILAO: Eu voo quando quiser, garoto. E pego o que quiser.",
-            "PETER: Nao se eu puder impedir!"
+            "PETER: Não se eu puder impedir!"
         },
-        // EPISODIO 2: SHOCKER
+        // EPISÓDIO 2: SHOCKER
         {
-            "NARRATIVA: Durante uma ronda pelas ruas, Peter ouviu uma sequencia de explosoes abafadas.",
-            "NARRATIVA: Seguindo o som, encontrou uma loja parcialmente destruida.",
-            "NARRATIVA: No meio dos destrocos, um homem com luvas estranhas disparava ondas pelo ar.",
-            "NARRATIVA: Cada impacto fazia o chao vibrar sob seus pes.",
-            "NARRATIVA: Quando Peter se aproximou, uma nova rajada veio direto na sua direcao.",
+            "NARRATIVA: Durante uma ronda pelas ruas, Peter ouviu uma sequência de explosões abafadas.",
+            "NARRATIVA: Seguindo o som, encontrou uma loja parcialmente destruída.",
+            "NARRATIVA: No meio dos destroços, um homem com luvas estranhas disparava ondas pelo ar.",
+            "NARRATIVA: Cada impacto fazia o chão vibrar sob seus pés.",
+            "NARRATIVA: Quando Peter se aproximou, uma nova rajada veio direto na sua direção.",
             "VILAO: Hoje eu termino o que comecei, Homem-Aranha!",
-            "PETER: Voce comecou alguma coisa?",
+            "PETER: Você começou alguma coisa?",
             "VILAO: Vou te transformar em poeira!",
-            "PETER: Cara, voce fala isso toda vez...",
-            "VILAO: E dessa vez e serio!",
-            "PETER: Ta bom, se voce diz."
+            "PETER: Cara, você fala isso toda vez...",
+            "VILAO: E dessa vez é sério!",
+            "PETER: Tá bom, se você diz."
         },
-        // EPISODIO 3: LAGARTO
+        // EPISÓDIO 3: LAGARTO
         {
-            "NARRATIVA: Investigando relatos estranhos sobre uma criatura causando visivel caos na cidade, Peter entrou em um laboratorio aparentemente abandonado.",
+            "NARRATIVA: Investigando relatos estranhos sobre uma criatura causando visível caos na cidade, Peter entrou em um laboratório aparentemente abandonado.",
             "NARRATIVA: O lugar estava revirado, com equipamentos quebrados e marcas pelas paredes.",
-            "NARRATIVA: Entre os destrocos, ele encontrou sinais de experimentos recentes.",
-            "NARRATIVA: Entao a avistou... e a reconheceu na hora.",
-            "NARRATIVA: Antes que pudesse falar, o monstro avancou com violencia.",
-            "PETER: Dr. Connors, voce precisa lutar contra isso!",
-            "VILAO: CONNORS NAO EXISTE MAIS!",
-            "PETER: Eu sei que ele ainda ta ai. Eu posso te ajudar.",
-            "VILAO: QUANTA ARROGANCIA VINDA DE UM INSETO PATETICO COMO VOCE!",
-            "PETER: Eu to aqui tentando te salvar!",
-            "VILAO: VOCE NAO CONSEGUE SALVAR NEM A SI MESMO, MOLEQUE! DESISTA!"
+            "NARRATIVA: Entre os destroços, ele encontrou sinais de experimentos recentes.",
+            "NARRATIVA: Então a avistou... e a reconheceu na hora.",
+            "NARRATIVA: Antes que pudesse falar, o monstro avançou com violência.",
+            "PETER: Dr. Connors, você precisa lutar contra isso!",
+            "VILAO: CONNORS NÃO EXISTE MAIS!",
+            "PETER: Eu sei que ele ainda está aí. Eu posso te ajudar.",
+            "VILAO: QUANTA ARROGÂNCIA VINDA DE UM INSETO PATÉTICO COMO VOCÊ!",
+            "PETER: Eu tô aqui tentando te salvar!",
+            "VILAO: VOCÊ NÃO CONSEGUE SALVAR NEM A SI MESMO, MOLEQUE! DESISTA!"
         }
     };
 
@@ -186,7 +213,7 @@ public class GameplayController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-            Jogador jogadorSessao = SessaoJogo.get().getJogador();
+        Jogador jogadorSessao = SessaoJogo.get().getJogador();
         String vilaoLogado = SessaoJogo.get().getVilaoAtual();
 
         boolean entrouPelaTeiaDeConfrontos = vilaoLogado != null && !vilaoLogado.isEmpty();
@@ -199,21 +226,20 @@ public class GameplayController implements Initializable {
                 default:         episodioResolvido = 1; break;
             }
 
-            // CORREÇÃO DO ITEM 3: Criamos uma instância temporária ("clone") para a luta da Teia.
-            // Assim, qualquer dano tomado aqui NÃO altera o HP salvo do seu Modo História.
-            // ==================== ENCONTRE ESTE TRECHO NO SEU INITIALIZE ====================
+            // Cria uma instância "clone" para a luta da Teia: qualquer dano tomado aqui
+            // NÃO altera o HP salvo do Modo História, já que as lutas da Teia não seguem
+            // ordem cronológica e cada confronto ali é independente.
             if (jogadorSessao != null) {
                 this.jogador = new Jogador(jogadorSessao.getNome());
                 this.jogador.setIdJogador(jogadorSessao.getIdJogador());
                 this.jogador.setXpAtual(jogadorSessao.getXpAtual());
                 this.jogador.setNivelAtual(jogadorSessao.getNivelAtual());
-                // Força o HP máximo independente do estado atual do Modo História
-                this.jogador.setHpAtual(this.jogador.getHpMaximo()); 
+                this.jogador.setHpAtual(this.jogador.getHpMaximo());
             } else {
                 this.jogador = new Jogador("Peter");
             }
         } else {
-            // Modo História: Usa a referência real da sessão para acumular dano/progresso sequencial
+            // Modo História: usa a referência real da sessão para acumular dano/progresso sequencial
             this.jogador = jogadorSessao;
             if (this.jogador == null) {
                 this.jogador = new Jogador("Peter");
@@ -235,13 +261,12 @@ public class GameplayController implements Initializable {
             vilao.setHpAtual(100);
             vilao.setNome(vilaoLogado != null ? vilaoLogado.toUpperCase() : "VILAO");
         }
-  
+
         // 1. Elementos visuais do jogador
         carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/miranha.png");
         carregarImagemComponente(imgPeterIcone, "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png");
 
-        // 2. Background (agora varia por episódio - antes era sempre gotham-city.png
-        // mesmo nas lutas contra Shocker e Lagarto, que ganharam seus próprios cenários)
+        // 2. Background (varia por episódio)
         if (episodioResolvido == 2) {
             carregarImagemComponente(imgBackground, "/com/mycompany/entreSombrasETeias/jogo/imagens/background-shocker.jpg");
         } else if (episodioResolvido == 3) {
@@ -297,22 +322,9 @@ public class GameplayController implements Initializable {
     private void configurarLetterbox() {
         if (palco == null || raizExterna == null) return;
 
-        // Garante que o StackPane raiz sempre tente ocupar 100% da Scene,
-        // mesmo que o FXML não tenha sido configurado com maxWidth/maxHeight=Infinity.
-        // Sem isso, em alguns casos o root não cresce junto com a janela/fullscreen
-        // e a largura/altura usadas no cálculo da escala ficam erradas.
         raizExterna.setMaxWidth(Double.MAX_VALUE);
         raizExterna.setMaxHeight(Double.MAX_VALUE);
 
-        // BUG CORRIGIDO: a Scale usava pivô em (0,0) - o canto superior esquerdo do palco.
-        // Isso faz a escala "encolher" o conteúdo a partir do canto, enquanto o StackPane
-        // centraliza o palco baseado no tamanho de LAYOUT (900x700, sem escala). Resultado:
-        // um descompasso entre onde o StackPane acha que o palco está e onde ele realmente
-        // aparece na tela, gerando o deslocamento ("elementos tortos/fora do lugar") sempre
-        // que o fator de escala é diferente de 1 - ou seja, fora da tela cheia. Usando o
-        // pivô no CENTRO do palco (450,350 = metade de 900x700), a escala encolhe/cresce
-        // simetricamente a partir do centro, que é exatamente onde o StackPane já posiciona
-        // o palco - eliminando o deslocamento.
         Scale escala = new Scale(1, 1, LARGURA_PALCO / 2.0, ALTURA_PALCO / 2.0);
         palco.getTransforms().add(escala);
 
@@ -321,12 +333,6 @@ public class GameplayController implements Initializable {
         raizExterna.widthProperty().addListener(recalcular);
         raizExterna.heightProperty().addListener(recalcular);
 
-        // BUG CORRIGIDO: se o Stage entra/sai do fullscreen DEPOIS que esta tela já
-        // carregou (ex.: setFullScreen(true) chamado em outro momento do fluxo),
-        // o width/height do raizExterna pode levar um instante para refletir o novo
-        // tamanho, ou disparar antes do SO terminar a transição. Escutar diretamente
-        // a propriedade fullScreenProperty() do Stage garante um recálculo extra
-        // assim que a transição de tela cheia terminar.
         Platform.runLater(() -> {
             aplicarEscalaLetterbox(escala);
             if (raizExterna.getScene() != null && raizExterna.getScene().getWindow() instanceof javafx.stage.Stage) {
@@ -613,77 +619,105 @@ public class GameplayController implements Initializable {
         if (danoFinal > 0 && vilao != null) {
             vilao.setHpAtual(Math.max(0, vilao.getHpAtual() - danoFinal));
             animarDanoInimigo(danoFinal);
+
+            // Pedido do usuário: o Super, além do dano extra, prende o vilão numa teia -
+            // o próximo turno dele fica mais lento e com menos dano (flag consumida em
+            // executarAtaqueEspecificoVilao), e ainda recebe veneno (5 dano/s por 5s).
+            if (tipoAtaqueAtual.equals("SUPER")) {
+                inimigoPresoNaTeiaNoProximoTurno = true;
+                iniciarVenenoNoVilao();
+            }
         }
 
         atualizarUI();
 
-       // ==================== NOVO BLOCO CORRIGIDO ====================
         if (vilao != null && vilao.getHpAtual() <= 0) {
-
-            if (jogador != null) jogador.ganharSuplemento();
-
-            if (jogador != null) {
-                int xpGanho = (vilao.getXpRecompensa() > 0) ? vilao.getXpRecompensa() : (episodioResolvido * 50);
-                jogador.adicionarXp(xpGanho);
-            }
-
-            if (jogador != null) {
-                if (episodioResolvido == 1) {
-                    jogador.setDerrotouAbutre(true);
-                } else if (episodioResolvido == 2) {
-                    jogador.setDerrotouShocker(true);
-                } else if (episodioResolvido == 3) {
-                    jogador.setDerrotouLagarto(true);
-                }
-            }
-
-            // CORREÇÃO DO ITEM 2: Avançar o nível do Modo História antes de salvar
-            int proximoEpisodio = episodioResolvido + 1;
-            
-            if (jogador != null) {
-                String vilaoLogado = SessaoJogo.get().getVilaoAtual();
-                boolean entrouPelaTeiaDeConfrontos = vilaoLogado != null && !vilaoLogado.isEmpty();
-                
-                // Só atualiza o nível atual se NÃO for a Teia de Confrontos
-                if (!entrouPelaTeiaDeConfrontos && proximoEpisodio <= 3) {
-                    jogador.setNivelAtual(proximoEpisodio);
-                }
-
-                final int idJogadorFinal = jogador.getIdJogador();
-                final Jogador jogadorParaSalvar = jogador;
-                final int proximoEpisodioFinal = proximoEpisodio;
-                final boolean isTeia = entrouPelaTeiaDeConfrontos;
-
-                Thread threadGravacao = new Thread(() -> {
-                    try {
-                        new JogadorDAO().atualizar(jogadorParaSalvar);
-                        
-                        // Salva o progresso e desbloqueia a fase se for Modo História
-                        if (!isTeia && proximoEpisodioFinal <= 3) {
-                            new FaseProgressoDAO().desbloquearEpisodio(idJogadorFinal, proximoEpisodioFinal);
-                        }
-                    } catch (SQLException ex) {
-                        System.err.println("Erro ao salvar progresso do jogador (XP/HP/nivel): " + ex.getMessage());
-                    }
-                });
-                threadGravacao.setDaemon(true);
-                threadGravacao.start();
-            }
-
-            if (labelStatusTurno != null)
-                labelStatusTurno.setText("Vitoria! O vilao foi derrotado.");
-
-            Timeline vitoriaDelay = new Timeline(new KeyFrame(Duration.seconds(2.0), e -> {
-                SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
-            }));
-
-            vitoriaDelay.play();
+            processarVitoria();
             return;
         }
-// ==================== FIM DO BLOCO CORRIGIDO ====================
 
         Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> iniciarTurnoInimigo()));
         delay.play();
+    }
+
+    // Lógica de vitória extraída para ser reutilizável: tanto quando o golpe do
+    // minigame de ritmo derruba o vilão para 0, quanto quando o veneno do Super
+    // (que tickeia fora do fluxo do minigame) faz isso sozinho.
+    private void processarVitoria() {
+        if (jogador != null) jogador.ganharSuplemento();
+
+        // XP ganho ao vencer: usa o XP cadastrado pro vilão; se o banco não tiver esse
+        // valor preenchido (0), cai num valor padrão crescente por episódio.
+        if (jogador != null && vilao != null) {
+            int xpGanho = (vilao.getXpRecompensa() > 0) ? vilao.getXpRecompensa() : (episodioResolvido * 50);
+            jogador.adicionarXp(xpGanho);
+        }
+
+        if (jogador != null) {
+            if (episodioResolvido == 1) {
+                jogador.setDerrotouAbutre(true);
+            } else if (episodioResolvido == 2) {
+                jogador.setDerrotouShocker(true);
+            } else if (episodioResolvido == 3) {
+                jogador.setDerrotouLagarto(true);
+            }
+        }
+
+        int proximoEpisodio = episodioResolvido + 1;
+
+        if (jogador != null) {
+            String vilaoLogado = SessaoJogo.get().getVilaoAtual();
+            boolean isTeia = vilaoLogado != null && !vilaoLogado.isEmpty();
+
+            // Só avança o nível de progresso real (que abre o próximo episódio no Modo
+            // História) quando a vitória aconteceu de fato no Modo História. Na Teia de
+            // Confrontos, jogador é um "clone" só desta luta, então não tem efeito sobre
+            // a sessão real mesmo - mas a flag isTeia ainda protege a gravação no banco.
+            if (!isTeia && proximoEpisodio <= 3) {
+                jogador.setNivelAtual(proximoEpisodio);
+            }
+
+            final int idJogadorFinal = jogador.getIdJogador();
+            final Jogador jogadorParaSalvar = jogador;
+            final int proximoEpisodioFinal = proximoEpisodio;
+            final boolean isTeiaFinal = isTeia;
+
+            Thread threadGravacao = new Thread(() -> {
+                try {
+                    new JogadorDAO().atualizar(jogadorParaSalvar);
+                    if (!isTeiaFinal && proximoEpisodioFinal <= 3) {
+                        new FaseProgressoDAO().desbloquearEpisodio(idJogadorFinal, proximoEpisodioFinal);
+                    }
+                } catch (SQLException ex) {
+                    System.err.println("Erro ao salvar progresso do jogador: " + ex.getMessage());
+                }
+            });
+            threadGravacao.setDaemon(true);
+            threadGravacao.start();
+        }
+
+        if (labelStatusTurno != null) {
+            labelStatusTurno.setVisible(true);
+            labelStatusTurno.setText("Vitoria! O vilao foi derrotado.");
+        }
+
+        Timeline vitoriaDelay = new Timeline(new KeyFrame(Duration.seconds(2.0), e -> {
+            SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
+        }));
+
+        vitoriaDelay.play();
+    }
+
+    // Chamado quando o veneno do Super derruba o vilão para 0 fora do fluxo normal
+    // do minigame de ritmo. BUG CORRIGIDO: a versão anterior chamava computarDanoRitmo()
+    // de novo nesse caso, o que reexecutava todo o cálculo de dano do minigame (usando a
+    // posição antiga do marcador) só para chegar no bloco de vitória - instável e podia
+    // causar dano duplicado. Agora chama processarVitoria() diretamente.
+    private void finalizarVitoriaPorVeneno() {
+        if (painelMinigameAtaque != null) painelMinigameAtaque.setVisible(false);
+        if (loopMinigame != null) loopMinigame.stop();
+        if (loopBatalha != null) loopBatalha.stop();
+        processarVitoria();
     }
 
     private void animarDanoInimigo(int dano) {
@@ -708,8 +742,17 @@ public class GameplayController implements Initializable {
     @FXML
     private void usarSentidoAranha() {
         if (jogador == null) return;
+
         jogador.setHpAtual(Math.min(jogador.getHpMaximo(), jogador.getHpAtual() + 15));
-        if (labelStatusTurno != null) labelStatusTurno.setText("Sentido Aranha ativado! +15 HP.");
+
+        // Pedido do usuário: Sentido Aranha também desacelera os ataques do próximo
+        // turno do inimigo (flag consumida em executarAtaqueEspecificoVilao).
+        sentidoAranhaAtivoParaProximoTurno = true;
+
+        if (labelStatusTurno != null) {
+            labelStatusTurno.setText("Sentido Aranha ativado! +15 HP e inimigo desacelerado.");
+        }
+
         concluirAcaoSuporte();
     }
 
@@ -718,7 +761,7 @@ public class GameplayController implements Initializable {
         if (jogador == null) return;
         if (jogador.usarSuplemento()) {
             if (labelStatusTurno != null)
-                labelStatusTurno.setText("Voce recuperou +15 HP.");
+                labelStatusTurno.setText("Voce recuperou +35 HP.");
 
             concluirAcaoSuporte();
         }
@@ -742,6 +785,7 @@ public class GameplayController implements Initializable {
         }
         jaLevouDanoNesteTurno = false;
         explosoesJaDetonadas.clear();
+        lagartosLateraisJaAtiraram.clear();
 
         if (caixaCombateUndertale != null) {
             caixaCombateUndertale.getChildren().removeAll(elementosAtaqueAtivos);
@@ -752,7 +796,31 @@ public class GameplayController implements Initializable {
     }
 
     private void executarAtaqueEspecificoVilao() {
-        int tipoAtaque = random.nextInt(3) + 1;
+        int tipoAtaque = sortearProximoTipoDeAtaque();
+
+        // BUG CORRIGIDO: sentidoAranhaAtivoParaProximoTurno e inimigoPresoNaTeiaNoProximoTurno
+        // eram setados em usarSentidoAranha()/computarDanoRitmo() mas nunca eram lidos em
+        // lugar nenhum - a desaceleração e a redução de dano nunca aconteciam de fato.
+        // Agora, no início de cada turno do inimigo, consumimos essas flags (lemos e
+        // resetamos) para definir os multiplicadores que valem só para ESTE turno.
+        multiplicadorVelocidadeInimigoNoTurno = 1.0;
+        multiplicadorDanoRecebidoNoTurno = 1.0;
+
+        if (sentidoAranhaAtivoParaProximoTurno) {
+            // Pedido do usuário: 30-40% mais lento -> usamos 35% de redução.
+            multiplicadorVelocidadeInimigoNoTurno *= 0.65;
+            sentidoAranhaAtivoParaProximoTurno = false;
+        }
+        if (inimigoPresoNaTeiaNoProximoTurno) {
+            // Vilão "preso na teia" pelo Super: ataques mais lentos E menos danosos.
+            multiplicadorVelocidadeInimigoNoTurno *= 0.55;
+            multiplicadorDanoRecebidoNoTurno *= 0.5;
+            inimigoPresoNaTeiaNoProximoTurno = false;
+            if (labelStatusTurno != null) {
+                // Esse texto não fica visível durante o turno do inimigo (o status some),
+                // mas garantimos que ao voltar para o turno do jogador não sobre texto preso.
+            }
+        }
 
         if (loopBatalha != null) loopBatalha.stop();
 
@@ -789,9 +857,7 @@ public class GameplayController implements Initializable {
 
                 verificarColisoesEImpacto();
 
-                // Dificuldade aumentada (pedido do usuário): turno do vilão de 4s -> 6s,
-                // dando mais tempo de ataques contínuos sem remover os limites de
-                // quantidade simultânea (que é o que mantém a esquiva justa/possível).
+                // Turno do inimigo dura 6s (dificuldade aumentada a pedido do usuário).
                 if (tempoDecorrido >= 6.0) {
                     this.stop();
                     finalizarTurnoDefensivo();
@@ -802,6 +868,8 @@ public class GameplayController implements Initializable {
     }
 
     private void processarAtaquesAbutre(int tipo, double tempo) {
+        double vel = multiplicadorVelocidadeInimigoNoTurno;
+
         if (tempo < 0.05) {
             if (tipo == 1) {
                 ImageView img = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-ataque.png", 60, 60);
@@ -819,9 +887,9 @@ public class GameplayController implements Initializable {
         }
 
         for (javafx.scene.Node node : elementosAtaqueAtivos) {
-            if (tipo == 1) node.setLayoutY(node.getLayoutY() + 5);
-            else if (tipo == 2) node.setLayoutX(node.getLayoutX() + 6);
-            else node.setLayoutX(node.getLayoutX() - 4);
+            if (tipo == 1) node.setLayoutY(node.getLayoutY() + 5 * vel);
+            else if (tipo == 2) node.setLayoutX(node.getLayoutX() + 6 * vel);
+            else node.setLayoutX(node.getLayoutX() - 4 * vel);
         }
     }
 
@@ -829,13 +897,11 @@ public class GameplayController implements Initializable {
     private java.util.Set<javafx.scene.Node> explosoesJaDetonadas = new java.util.HashSet<>();
 
     private void processarAtaquesShocker(int tipo, double tempo) {
-        // Dificuldade aumentada (pedido do usuário): frequências e limites de
-        // quantidade simultânea subiram um pouco em relação à versão anterior,
-        // mantendo os mesmos sprites e o telégrafo da explosão intactos.
+        double vel = multiplicadorVelocidadeInimigoNoTurno;
 
         // TIPO 1: raio vindo da direita
         if (tipo == 1 && Math.random() < 0.018 && elementosAtaqueAtivos.size() < 5) {
-            ImageView raio = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque2-shocker.png", 50, 50);
+            ImageView raio = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/raio-shocker-ataque2.png", 50, 50);
             if (raio != null) {
                 raio.setLayoutX(640);
                 raio.setLayoutY(random.nextInt(110) + 10);
@@ -843,9 +909,7 @@ public class GameplayController implements Initializable {
             }
         }
 
-        // TIPO 2: explosões com telégrafo. Antes só disparava uma vez por turno
-        // (tempo < 0.05); agora repete a cada ~2s do turno (mais ondas de explosão),
-        // mantendo a mesma lógica de telégrafo (cresce -> só aí causa dano).
+        // TIPO 2: explosões com telégrafo, repetindo a cada ~2s do turno.
         boolean momentoDeNovaOndaExplosao = (tempo < 0.05) || (Math.abs(tempo % 2.0) < 0.05);
         if (tipo == 2 && momentoDeNovaOndaExplosao && elementosAtaqueAtivos.size() < 6) {
             for (int i = 0; i < 3; i++) {
@@ -874,14 +938,11 @@ public class GameplayController implements Initializable {
                 ImageView iv = (ImageView) node;
                 String caminho = iv.getImage() != null ? iv.getImage().getUrl() : "";
 
-                if (caminho != null && caminho.contains("ataque2-shocker")) {
-                    // Raio: anda da direita pra esquerda
-                    iv.setLayoutX(iv.getLayoutX() - 4.5);
+                if (caminho != null && caminho.contains("raio-shocker-ataque2")) {
+                    iv.setLayoutX(iv.getLayoutX() - 4.5 * vel);
                 } else if (caminho != null && caminho.contains("ataque-explosao-shocker")) {
-                    // Explosão: cresce lentamente (telégrafo). Ao chegar no tamanho final,
-                    // marca como "detonada" pela primeira vez - é esse instante que conta pra dano.
                     if (iv.getFitWidth() < 70) {
-                        double novoTamanho = iv.getFitWidth() + 1.1;
+                        double novoTamanho = iv.getFitWidth() + 1.1 * vel;
                         iv.setFitWidth(novoTamanho);
                         iv.setFitHeight(novoTamanho);
                         iv.setOpacity(Math.min(1.0, 0.35 + (novoTamanho / 70.0) * 0.65));
@@ -889,37 +950,99 @@ public class GameplayController implements Initializable {
                         explosoesJaDetonadas.add(iv);
                     }
                 } else if (caminho != null && caminho.contains("ataque-shocker")) {
-                    // Cometa: cai em diagonal (desce e desliza levemente pra esquerda)
-                    iv.setLayoutY(iv.getLayoutY() + 4.5);
-                    iv.setLayoutX(iv.getLayoutX() - 1.5);
+                    iv.setLayoutY(iv.getLayoutY() + 4.5 * vel);
+                    iv.setLayoutX(iv.getLayoutX() - 1.5 * vel);
                 }
             }
         }
     }
 
+    // Marca quais sprites de "lagarto parado nas laterais" (ataque 3) já lançaram
+    // sua gosma nesta aparição, para cada um lançar uma vez só por ciclo.
+    private java.util.Set<javafx.scene.Node> lagartosLateraisJaAtiraram = new java.util.HashSet<>();
+
     private void processarAtaquesLagarto(int tipo, double tempo) {
-        // Dificuldade aumentada (pedido do usuário): frequências e limites de
-        // quantidade simultânea subiram em relação à versão anterior, mantendo o
-        // limite de quantidade no tipo 2 (que corrigiu o bug do "spam impossível").
-        if (tipo == 1 && Math.random() < 0.018 && elementosAtaqueAtivos.size() < 5) {
-            ImageView gosma = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/gosma.png", 30, 30);
-            if (gosma != null) { gosma.setLayoutX(random.nextInt(580) + 20); gosma.setLayoutY(-30); adicionarObjetoAoPainel(gosma); }
-        }
-        if (tipo == 2 && Math.random() < 0.02 && elementosAtaqueAtivos.size() < 4) {
-            ImageView corrida = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/gosma.png", 40, 20);
-            if (corrida != null && iconeCoracaoAranha != null) { corrida.setLayoutX(-40); corrida.setLayoutY(iconeCoracaoAranha.getLayoutY()); adicionarObjetoAoPainel(corrida); }
-        }
-        // Tipo 3 agora repete a cada ~2.2s do turno (antes só disparava uma vez, tempo < 0.05)
-        boolean momentoDeNovoArco = (tempo < 0.05) || (Math.abs(tempo % 2.2) < 0.05);
-        if (tipo == 3 && momentoDeNovoArco && elementosAtaqueAtivos.size() < 4) {
-            Rectangle arco = new Rectangle(100, 12, Color.LIMEGREEN);
-            arco.setLayoutX(250); arco.setLayoutY(60);
-            adicionarObjetoAoPainel(arco);
+        double vel = multiplicadorVelocidadeInimigoNoTurno;
+
+        // Ataques reformulados (pedido do usuário) seguindo o documento de design:
+        // 1) Salto aleatório: ataque1-lagarto aparece em posição aleatória e "bate" no chão
+        // 2) Corrida horizontal: VÁRIOS ataque2-lagarto atravessam rápido a tela
+        // 3) Cauda em arco: 2 ataque3-lagarto ficam parados nas laterais (esquerda/direita)
+        //    e lançam a gosma.png pré-existente em direção ao centro
+
+        // TIPO 1: salto aleatório - aparece em posição aleatória e bate no chão
+        if (tipo == 1 && Math.random() < 0.022 && elementosAtaqueAtivos.size() < 4) {
+            ImageView salto = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque1-lagarto.png", 55, 55);
+            if (salto != null) {
+                salto.setLayoutX(random.nextInt(560) + 20);
+                salto.setLayoutY(random.nextInt(110) + 15);
+                adicionarObjetoAoPainel(salto);
+            }
         }
 
-        for (javafx.scene.Node node : elementosAtaqueAtivos) {
-            if (tipo == 1) node.setLayoutY(node.getLayoutY() + 3.2);
-            else if (tipo == 2) node.setLayoutX(node.getLayoutX() + 6);
+        // TIPO 2: corrida horizontal - vários lagartos atravessando a tela ao mesmo tempo
+        if (tipo == 2 && Math.random() < 0.025 && elementosAtaqueAtivos.size() < 6) {
+            boolean vemDaDireita = random.nextBoolean();
+            ImageView corredor = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque2-lagarto.png", 40, 40);
+            if (corredor != null) {
+                corredor.setLayoutX(vemDaDireita ? 650 : -45);
+                corredor.setLayoutY(random.nextInt(120) + 10);
+                corredor.setUserData(vemDaDireita ? "esquerda" : "direita");
+                adicionarObjetoAoPainel(corredor);
+            }
+        }
+
+        // TIPO 3: cauda em arco - 2 lagartos parados nas laterais (um de cada lado)
+        // lançando a gosma pré-existente em direção ao centro. Repete a cada ~2.5s.
+        boolean momentoDeNovaSalva = (tempo < 0.05) || (Math.abs(tempo % 2.5) < 0.05);
+        if (tipo == 3 && momentoDeNovaSalva && elementosAtaqueAtivos.size() < 5) {
+            ImageView lagartoEsq = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque3-lagarto.png", 50, 50);
+            if (lagartoEsq != null) {
+                lagartoEsq.setLayoutX(5);
+                lagartoEsq.setLayoutY(60);
+                lagartoEsq.setUserData("lateral-esquerda");
+                adicionarObjetoAoPainel(lagartoEsq);
+            }
+            ImageView lagartoDir = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque3-lagarto.png", 50, 50);
+            if (lagartoDir != null) {
+                lagartoDir.setLayoutX(595);
+                lagartoDir.setLayoutY(60);
+                lagartoDir.setUserData("lateral-direita");
+                adicionarObjetoAoPainel(lagartoDir);
+            }
+        }
+
+        // Itera sobre uma CÓPIA da lista: o loop abaixo pode adicionar uma nova gosma
+        // lançada à lista original (elementosAtaqueAtivos) quando um lagarto lateral
+        // ainda não atirou - modificar a lista original durante sua própria iteração
+        // causaria ConcurrentModificationException.
+        for (javafx.scene.Node node : new ArrayList<>(elementosAtaqueAtivos)) {
+            if (!(node instanceof ImageView)) continue;
+            ImageView iv = (ImageView) node;
+            Object userData = iv.getUserData();
+
+            if ("esquerda".equals(userData)) {
+                iv.setLayoutX(iv.getLayoutX() - 7.0 * vel);
+            } else if ("direita".equals(userData)) {
+                iv.setLayoutX(iv.getLayoutX() + 7.0 * vel);
+            } else if ("lateral-esquerda".equals(userData) || "lateral-direita".equals(userData)) {
+                // lagarto lateral parado: lança uma gosma em direção ao centro, uma única vez
+                if (!lagartosLateraisJaAtiraram.contains(iv)) {
+                    lagartosLateraisJaAtiraram.add(iv);
+                    boolean vemDaEsquerda = "lateral-esquerda".equals(userData);
+                    ImageView gosmaLancada = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/gosma.png", 35, 20);
+                    if (gosmaLancada != null) {
+                        gosmaLancada.setLayoutX(vemDaEsquerda ? 55 : 565);
+                        gosmaLancada.setLayoutY(iv.getLayoutY() + 15);
+                        gosmaLancada.setUserData(vemDaEsquerda ? "gosma-direita" : "gosma-esquerda");
+                        adicionarObjetoAoPainel(gosmaLancada);
+                    }
+                }
+            } else if ("gosma-direita".equals(userData)) {
+                iv.setLayoutX(iv.getLayoutX() + 6.5 * vel);
+            } else if ("gosma-esquerda".equals(userData)) {
+                iv.setLayoutX(iv.getLayoutX() - 6.5 * vel);
+            }
         }
     }
 
@@ -939,10 +1062,7 @@ public class GameplayController implements Initializable {
         if (iconeCoracaoAranha == null || jogador == null) return;
         for (javafx.scene.Node node : elementosAtaqueAtivos) {
 
-            // BUG CORRIGIDO (pedido do usuário): a explosão do Shocker tinha que dar tempo
-            // do jogador fugir ANTES de explodir de verdade. Enquanto a imagem ainda está
-            // "crescendo" (telégrafo), ela não causa dano - só conta como ataque de verdade
-            // depois que chega no tamanho final e é marcada em explosoesJaDetonadas.
+            // Explosão do Shocker em telégrafo não causa dano enquanto ainda está crescendo.
             if (node instanceof ImageView) {
                 ImageView iv = (ImageView) node;
                 String caminho = iv.getImage() != null ? iv.getImage().getUrl() : "";
@@ -954,7 +1074,11 @@ public class GameplayController implements Initializable {
 
             if (node.getBoundsInParent().intersects(iconeCoracaoAranha.getBoundsInParent())) {
                 if (!jaLevouDanoNesteTurno) {
-                    jogador.setHpAtual(Math.max(0, jogador.getHpAtual() - 15));
+                    // Pedido do usuário: vilão "preso na teia" pelo Super causa MENOS dano
+                    // no turno seguinte (multiplicadorDanoRecebidoNoTurno consumido aqui).
+                    int danoBase = 15;
+                    int danoFinal = (int) Math.round(danoBase * multiplicadorDanoRecebidoNoTurno);
+                    jogador.setHpAtual(Math.max(0, jogador.getHpAtual() - danoFinal));
                     jaLevouDanoNesteTurno = true;
                     atualizarUI();
 
@@ -986,4 +1110,70 @@ public class GameplayController implements Initializable {
 
     @FXML private void executarFugir() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/gameover.fxml"); }
     @FXML private void voltarMenuInicial() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml"); }
+
+    // Pedido do usuário: veneno do Super - 5 de dano por segundo, durante 5 segundos
+    // (5 ticks de 5 dano cada = 25 de dano total). Para imediatamente se o vilão
+    // morrer antes do veneno terminar (não continua tickando em um vilão já derrotado).
+    private void iniciarVenenoNoVilao() {
+        if (vilao == null || imgVilao == null || labelDanoPopup == null) return;
+
+        if (loopVenenoTimeline != null) {
+            loopVenenoTimeline.stop();
+        }
+
+        // Deixa o vilão visualmente esverdeado durante o efeito.
+        ColorAdjust efeitoVerdeVeneno = new ColorAdjust();
+        efeitoVerdeVeneno.setContrast(0.3);
+        efeitoVerdeVeneno.setHue(0.4);
+        efeitoVerdeVeneno.setSaturation(0.8);
+        imgVilao.setEffect(efeitoVerdeVeneno);
+
+        loopVenenoTimeline = new Timeline();
+        for (int tick = 1; tick <= 5; tick++) {
+            KeyFrame frameVeneno = new KeyFrame(Duration.seconds(tick), event -> {
+                if (vilao == null || vilao.getHpAtual() <= 0) {
+                    if (loopVenenoTimeline != null) loopVenenoTimeline.stop();
+                    return;
+                }
+
+                vilao.setHpAtual(Math.max(0, vilao.getHpAtual() - 5));
+                atualizarUI();
+
+                labelDanoPopup.setText("-5 HP (veneno)");
+                labelDanoPopup.setStyle("-fx-text-fill: #22cc44; -fx-font-weight: bold;");
+                labelDanoPopup.setVisible(true);
+
+                double originalX = imgVilao.getTranslateX();
+                Timeline tremorVeneno = new Timeline(
+                    new KeyFrame(Duration.millis(0),   new KeyValue(imgVilao.translateXProperty(), originalX)),
+                    new KeyFrame(Duration.millis(50),  new KeyValue(imgVilao.translateXProperty(), originalX + 6)),
+                    new KeyFrame(Duration.millis(100), new KeyValue(imgVilao.translateXProperty(), originalX - 6)),
+                    new KeyFrame(Duration.millis(150), new KeyValue(imgVilao.translateXProperty(), originalX))
+                );
+                tremorVeneno.play();
+
+                Timeline fecharPopup = new Timeline(new KeyFrame(Duration.millis(600), e -> labelDanoPopup.setVisible(false)));
+                fecharPopup.play();
+
+                // BUG CORRIGIDO: a versão anterior chamava computarDanoRitmo() aqui dentro,
+                // o que reexecutava o cálculo de dano do minigame de ritmo (usando a posição
+                // antiga do marcador) só para chegar no bloco de vitória - instável e podia
+                // gerar dano duplicado. Agora chama finalizarVitoriaPorVeneno() diretamente,
+                // que para os loops em andamento e processa a vitória sem recalcular dano.
+                if (vilao.getHpAtual() <= 0) {
+                    if (loopVenenoTimeline != null) loopVenenoTimeline.stop();
+                    imgVilao.setEffect(null);
+                    finalizarVitoriaPorVeneno();
+                }
+            });
+            loopVenenoTimeline.getKeyFrames().add(frameVeneno);
+        }
+
+        loopVenenoTimeline.setOnFinished(e -> {
+            if (imgVilao != null) imgVilao.setEffect(null);
+            if (labelDanoPopup != null) labelDanoPopup.setStyle("");
+        });
+
+        loopVenenoTimeline.play();
+    }
 }

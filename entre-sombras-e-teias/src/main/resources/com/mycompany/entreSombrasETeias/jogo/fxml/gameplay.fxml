@@ -52,7 +52,7 @@
                                text="HP: 100/100"
                                textFill="WHITE">
                             <font>
-                                <Font name="Courier New Bold" size="14.0"/>
+                                <Font name="Press Start 2P" size="12.0"/>
                             </font>
                         </Label>
 
@@ -66,7 +66,7 @@
                                text="DIFICULDADE VILÃO: LVL 1"
                                textFill="#cccccc">
                             <font>
-                                <Font name="Courier New Bold" size="11.0"/>
+                                <Font name="Press Start 2P" size="9.0"/>
                             </font>
                         </Label>
 
@@ -74,17 +74,20 @@
 
                 </VBox>
 
+                <!-- ===================== BLOCO CENTRAL DE COMBATE ===================== -->
                 <VBox alignment="TOP_CENTER"
-                      spacing="15.0"
-                      AnchorPane.bottomAnchor="10.0"
-                      AnchorPane.leftAnchor="50.0"
-                      AnchorPane.rightAnchor="50.0"
-                      AnchorPane.topAnchor="15.0">
+                      spacing="12.0"
+                      prefWidth="650.0"
+                      maxWidth="650.0"
+                      AnchorPane.topAnchor="20.0"
+                      AnchorPane.bottomAnchor="20.0"
+                      AnchorPane.leftAnchor="125.0"
+                      AnchorPane.rightAnchor="125.0">
 
                     <children>
 
-                        <!-- HP VILÃO -->
-                        <VBox alignment="CENTER" spacing="5.0">
+                        <!-- HP VILÃO + SPRITE + BALÃO DE FALA -->
+                        <VBox alignment="CENTER" spacing="6.0" prefWidth="650.0">
 
                             <children>
 
@@ -94,52 +97,52 @@
                                              progress="1.0"
                                              style="-fx-accent: #ff0000;" />
 
-                                <AnchorPane prefHeight="120.0" prefWidth="800.0">
+                                <AnchorPane prefHeight="120.0" prefWidth="650.0">
 
                                     <children>
 
                                         <ImageView fx:id="imgVilao"
                                                    fitHeight="115.0"
                                                    fitWidth="155.0"
-                                                   layoutX="322.0"
+                                                   layoutX="247.0"
                                                    layoutY="2.0"
                                                    pickOnBounds="true"
                                                    preserveRatio="true" />
 
                                         <Label fx:id="labelDanoPopup"
-                                               layoutX="520.0"
+                                               layoutX="445.0"
                                                layoutY="45.0"
                                                text="-45 HP"
                                                textFill="RED"
                                                visible="false">
 
                                             <font>
-                                                <Font name="Courier New Bold" size="28.0"/>
+                                                <Font name="Press Start 2P" size="20.0"/>
                                             </font>
 
                                         </Label>
 
-                                        <!-- BALÃO VILÃO (CORRIGIDO) -->
+                                        <!-- BALÃO VILÃO -->
                                         <AnchorPane fx:id="painelBalaoVilao"
-                                                    layoutX="500.0"
-                                                    layoutY="0.0"
+                                                    layoutX="425.0"
+                                                    layoutY="10.0"
                                                     prefHeight="90.0"
-                                                    prefWidth="230.0"
+                                                    prefWidth="210.0"
                                                     style="-fx-background-color:white; -fx-border-color:black; -fx-border-width:2; -fx-background-radius:10;">
 
                                             <children>
 
                                                 <Label fx:id="labelDialogoVilao"
                                                        layoutX="10.0"
-                                                       layoutY="8.0"
-                                                       prefHeight="72.0"
-                                                       prefWidth="210.0"
+                                                       layoutY="10.0"
+                                                       prefHeight="70.0"
+                                                       prefWidth="190.0"
                                                        text="Renda-se!"
                                                        textFill="BLACK"
                                                        wrapText="true">
 
                                                     <font>
-                                                        <Font name="Courier New Bold" size="12.0"/>
+                                                        <Font name="Press Start 2P" size="10.0"/>
                                                     </font>
 
                                                 </Label>
@@ -157,7 +160,7 @@
                         </VBox>
 
                         <!-- CAIXA DE COMBATE -->
-                        <StackPane alignment="CENTER">
+                        <StackPane alignment="CENTER" prefWidth="650.0">
 
                             <children>
 
@@ -190,7 +193,7 @@
                         </StackPane>
 
                         <!-- NARRATIVA / MINIGAME -->
-                        <StackPane prefHeight="130.0">
+                        <StackPane prefHeight="130.0" prefWidth="650.0">
 
                             <children>
 
@@ -221,7 +224,7 @@
                                                wrapText="true">
 
                                             <font>
-                                                <Font name="Courier New Bold" size="14.0"/>
+                                                <Font name="Press Start 2P" size="11.0"/>
                                             </font>
 
                                         </Label>
@@ -237,7 +240,7 @@
                                                 text="CONTINUAR ➔">
 
                                             <font>
-                                                <Font name="Courier New Bold" size="11.0"/>
+                                                <Font name="Press Start 2P" size="8.0"/>
                                             </font>
 
                                         </Button>
@@ -286,7 +289,7 @@
                                textFill="YELLOW">
 
                             <font>
-                                <Font name="Courier New Bold" size="16.0"/>
+                                <Font name="Press Start 2P" size="12.0"/>
                             </font>
 
                         </Label>
@@ -303,11 +306,11 @@
                                         mnemonicParsing="false"
                                         onAction="#mostrarOpcoesAtaque"
                                         prefHeight="40.0"
-                                        prefWidth="140.0"
+                                        prefWidth="200.0"
                                         style="-fx-background-color: #8b0000; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="⚔ ATACAR">
                                     <font>
-                                        <Font name="Courier New Bold" size="13.0"/>
+                                        <Font name="Press Start 2P" size="11.0"/>
                                     </font>
                                 </Button>
 
@@ -315,11 +318,11 @@
                                         mnemonicParsing="false"
                                         onAction="#mostrarOpcoesRecuperar"
                                         prefHeight="40.0"
-                                        prefWidth="140.0"
+                                        prefWidth="200.0"
                                         style="-fx-background-color: #0a5c0a; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="✚ RECUPERAR">
                                     <font>
-                                        <Font name="Courier New Bold" size="13.0"/>
+                                        <Font name="Press Start 2P" size="11.0"/>
                                     </font>
                                 </Button>
 
@@ -327,11 +330,11 @@
                                         mnemonicParsing="false"
                                         onAction="#executarFugir"
                                         prefHeight="40.0"
-                                        prefWidth="140.0"
+                                        prefWidth="200.0"
                                         style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="🏃 FUGIR">
                                     <font>
-                                        <Font name="Courier New Bold" size="13.0"/>
+                                        <Font name="Press Start 2P" size="11.0"/>
                                     </font>
                                 </Button>
 
@@ -352,11 +355,11 @@
                                         mnemonicParsing="false"
                                         onAction="#iniciarMinigameOnda"
                                         prefHeight="40.0"
-                                        prefWidth="160.0"
+                                        prefWidth="220.0"
                                         style="-fx-background-color: #8b0000; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="🥊 GOLPE RÁPIDO">
                                     <font>
-                                        <Font name="Courier New Bold" size="12.0"/>
+                                        <Font name="Press Start 2P" size="9.0"/>
                                     </font>
                                 </Button>
 
@@ -364,22 +367,22 @@
                                         mnemonicParsing="false"
                                         onAction="#iniciarMinigameSuper"
                                         prefHeight="40.0"
-                                        prefWidth="180.0"
+                                        prefWidth="240.0"
                                         style="-fx-background-color: #4b0082; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="💥 SUPER (0%)">
                                     <font>
-                                        <Font name="Courier New Bold" size="12.0"/>
+                                        <Font name="Press Start 2P" size="9.0"/>
                                     </font>
                                 </Button>
 
                                 <Button mnemonicParsing="false"
                                         onAction="#voltarParaMenuLuta"
                                         prefHeight="40.0"
-                                        prefWidth="100.0"
+                                        prefWidth="140.0"
                                         style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="◀ VOLTAR">
                                     <font>
-                                        <Font name="Courier New Bold" size="12.0"/>
+                                        <Font name="Press Start 2P" size="9.0"/>
                                     </font>
                                 </Button>
 
@@ -399,11 +402,11 @@
                                 <Button mnemonicParsing="false"
                                         onAction="#usarSentidoAranha"
                                         prefHeight="40.0"
-                                        prefWidth="180.0"
+                                        prefWidth="240.0"
                                         style="-fx-background-color: #0a5c0a; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="🕸 SENTIDO ARANHA (+15)">
                                     <font>
-                                        <Font name="Courier New Bold" size="11.0"/>
+                                        <Font name="Press Start 2P" size="8.0"/>
                                     </font>
                                 </Button>
 
@@ -411,22 +414,22 @@
                                         mnemonicParsing="false"
                                         onAction="#usarSuplemento"
                                         prefHeight="40.0"
-                                        prefWidth="180.0"
+                                        prefWidth="240.0"
                                         style="-fx-background-color: #0a5c0a; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="🥤 SUPLEMENTO (0)">
                                     <font>
-                                        <Font name="Courier New Bold" size="11.0"/>
+                                        <Font name="Press Start 2P" size="8.0"/>
                                     </font>
                                 </Button>
 
                                 <Button mnemonicParsing="false"
                                         onAction="#voltarParaMenuLuta"
                                         prefHeight="40.0"
-                                        prefWidth="100.0"
+                                        prefWidth="140.0"
                                         style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
                                         text="◀ VOLTAR">
                                     <font>
-                                        <Font name="Courier New Bold" size="12.0"/>
+                                        <Font name="Press Start 2P" size="9.0"/>
                                     </font>
                                 </Button>
 
@@ -453,15 +456,19 @@
 
                         <Label text="VOCÊ FOI DERROTADO" textFill="RED">
                             <font>
-                                <Font name="Courier New Bold" size="32.0"/>
+                                <Font name="Press Start 2P" size="22.0"/>
                             </font>
                         </Label>
 
                         <Button text="VOLTAR AO MENU"
                                 onAction="#voltarMenuInicial"
                                 style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: white;"
-                                prefWidth="200.0"
-                                prefHeight="40.0"/>
+                                prefWidth="220.0"
+                                prefHeight="40.0">
+                            <font>
+                                <Font name="Press Start 2P" size="10.0"/>
+                            </font>
+                        </Button>
 
                     </children>
 
