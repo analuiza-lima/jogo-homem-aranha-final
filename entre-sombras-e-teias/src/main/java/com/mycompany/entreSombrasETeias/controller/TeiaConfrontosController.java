@@ -74,11 +74,7 @@ public class TeiaConfrontosController {
     }
 
     private void processarSelecao(Button botaoClicado, ImageView imgView, String nomeVilao, String caminhoImagemColorida) {
-        // BUG CORRIGIDO: se algum botão/imagem vier nulo do FXML (fx:id incorreto, por exemplo),
-        // o método inteiro saía sem aplicar a seleção, deixando o estado inconsistente
-        // (botão sem destaque, vilão não salvo, botão confirmar nunca habilitado).
-        // Agora cada acesso é protegido individualmente, e a seleção lógica (vilaoEscolhido)
-        // continua valendo mesmo que algum elemento visual específico esteja ausente.
+       
         resetarImagensParaPretoEBranco();
 
         for (Button btn : todosBotoes) {

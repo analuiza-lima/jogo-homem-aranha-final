@@ -57,8 +57,9 @@ public class GaleriaController implements Initializable {
         int fim = Math.min(inicio + ITENS_POR_PAGINA, listaProgresso.size());
 
         int indiceGrid = 0;
-        for (int i = inicio; i < fim; i++) {
+       for (int i = inicio; i < fim; i++) {
             FaseProgresso fase = listaProgresso.get(i);
+            int numEpisodio = fase.getNumeroEpisodio(); 
             
             // StackPane para conter a imagem perfeitamente posicionada no Grid
             StackPane painelItem = new StackPane();
@@ -69,9 +70,21 @@ public class GaleriaController implements Initializable {
             imgExibicao.setFitWidth(95);
             imgExibicao.setPreserveRatio(false);
 
-            if (!fase.isBloqueado()) {
-                // Se o boss foi derrotado, descobrimos o arquivo correspondente pelo número do episódio
-                int numEpisodio = fase.getNumeroEpisodio(); 
+            // Nova checagem inteligente: Só mostra a imagem se o boss correspondente foi DE FATO derrotado
+            boolean bossDerrotado = false;
+            com.mycompany.entreSombrasETeias.model.Jogador jog = SessaoJogo.get().getJogador();
+            
+            if (jog != null) {
+                switch (numEpisodio) {
+                    case 1: bossDerrotado = jog.isDerrotouAbutre(); break;
+                    case 2: bossDerrotado = jog.isDerrotouShocker(); break;
+                    case 3: bossDerrotado = jog.isDerrotouLagarto(); break;
+                    default: bossDerrotado = false; break;
+                }
+            }
+
+            if (bossDerrotado) {
+                // Se o boss foi realmente derrotado, carrega a arte da vitória correspondente
                 String arquivoImagem = obterNomeArquivoPorEpisodio(numEpisodio);
                 String caminhoArte = "/com/mycompany/entreSombrasETeias/jogo/imagens/" + arquivoImagem;
                 
@@ -84,14 +97,14 @@ public class GaleriaController implements Initializable {
                 }
                 painelItem.getChildren().add(imgExibicao);
             } else {
-                // Se está bloqueado, renderiza diretamente a imagem customizada de bloqueio
+                // Se o boss não foi derrotado ainda (fase bloqueada OU fase liberada para jogar mas não vencida), mostra o cadeado
                 String caminhoCadeado = "/com/mycompany/entreSombrasETeias/jogo/imagens/imagembloqueada.png";
                 try (InputStream isCadeado = getClass().getResourceAsStream(caminhoCadeado)) {
                     if (isCadeado != null) {
                         imgExibicao.setImage(new Image(isCadeado));
                     }
                 } catch (Exception e) {
-                    System.out.println("Erro ao carregar o cadeado de bloqueio.");
+                    System.out.println("Erro ao carregar o cadeado de micro-bloqueio.");
                 }
                 painelItem.getChildren().add(imgExibicao);
             }

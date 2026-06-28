@@ -186,20 +186,41 @@ public class GameplayController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        jogador = SessaoJogo.get().getJogador();
+            Jogador jogadorSessao = SessaoJogo.get().getJogador();
         String vilaoLogado = SessaoJogo.get().getVilaoAtual();
 
-        if (vilaoLogado != null && !vilaoLogado.isEmpty()) {
+        boolean entrouPelaTeiaDeConfrontos = vilaoLogado != null && !vilaoLogado.isEmpty();
+
+        if (entrouPelaTeiaDeConfrontos) {
             switch (vilaoLogado.toLowerCase()) {
-                case "abutre":   episodioResolvido = 1; break;
-                case "shocker":  episodioResolvido = 2; break;
-                case "lagarto":  episodioResolvido = 3; break;
+                case "abutre":  episodioResolvido = 1; break;
+                case "shocker": episodioResolvido = 2; break;
+                case "lagarto": episodioResolvido = 3; break;
                 default:         episodioResolvido = 1; break;
             }
+
+            // CORREÇÃO DO ITEM 3: Criamos uma instância temporária ("clone") para a luta da Teia.
+            // Assim, qualquer dano tomado aqui NÃO altera o HP salvo do seu Modo História.
+            // ==================== ENCONTRE ESTE TRECHO NO SEU INITIALIZE ====================
+            if (jogadorSessao != null) {
+                this.jogador = new Jogador(jogadorSessao.getNome());
+                this.jogador.setIdJogador(jogadorSessao.getIdJogador());
+                this.jogador.setXpAtual(jogadorSessao.getXpAtual());
+                this.jogador.setNivelAtual(jogadorSessao.getNivelAtual());
+                // Força o HP máximo independente do estado atual do Modo História
+                this.jogador.setHpAtual(this.jogador.getHpMaximo()); 
+            } else {
+                this.jogador = new Jogador("Peter");
+            }
         } else {
-            episodioResolvido = (jogador != null) ? jogador.getNivelAtual() : 1;
+            // Modo História: Usa a referência real da sessão para acumular dano/progresso sequencial
+            this.jogador = jogadorSessao;
+            if (this.jogador == null) {
+                this.jogador = new Jogador("Peter");
+            }
+            episodioResolvido = this.jogador.getNivelAtual();
         }
+
         episodioResolvido = Math.max(1, Math.min(episodioResolvido, 3));
 
         try {
@@ -208,32 +229,13 @@ public class GameplayController implements Initializable {
             vilao = null;
         }
 
-        // Defesa extra: cobre tanto exception quanto DAO retornando null sem lancar erro.
         if (vilao == null) {
             vilao = new Vilao();
             vilao.setHpMaximo(100);
             vilao.setHpAtual(100);
             vilao.setNome(vilaoLogado != null ? vilaoLogado.toUpperCase() : "VILAO");
         }
-
-        // Defesa extra: garante jogador valido mesmo se a sessao nao tiver sido preenchida.
-        // OBS: Jogador.getHpMaximo() e calculado a partir do nivel (100 + (nivel-1)*20),
-        // entao nao existe setHpMaximo() na classe - o construtor ja deixa hpAtual = hpMaximo.
-        if (jogador == null) {
-            jogador = new Jogador("Peter");
-        }
-
-        // BUG CORRIGIDO (pedido do usuário): na Teia de Confrontos as lutas não seguem
-        // ordem cronológica (o jogador escolhe livremente qual vilão enfrentar), então
-        // terminar uma luta com HP baixo não deveria carregar pra próxima - cada confronto
-        // ali é independente. Isso só vale pro fluxo da Teia (vilaoLogado preenchido);
-        // no Modo História o HP continua acumulando entre episódios normalmente, pois ali
-        // a progressão é sequencial e faz sentido carregar o dano sofrido.
-        boolean entrouPelaTeiaDeConfrontos = vilaoLogado != null && !vilaoLogado.isEmpty();
-        if (entrouPelaTeiaDeConfrontos) {
-            jogador.setHpAtual(jogador.getHpMaximo());
-        }
-
+  
         // 1. Elementos visuais do jogador
         carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/miranha.png");
         carregarImagemComponente(imgPeterIcone, "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png");
@@ -615,15 +617,11 @@ public class GameplayController implements Initializable {
 
         atualizarUI();
 
+       // ==================== NOVO BLOCO CORRIGIDO ====================
         if (vilao != null && vilao.getHpAtual() <= 0) {
 
             if (jogador != null) jogador.ganharSuplemento();
 
-            // BUG CORRIGIDO: vencer uma luta nunca chamava jogador.adicionarXp(), então o
-            // XP do jogador ficava sempre em 0 (mesmo zerando o save, nunca havia ganho).
-            // Usa o XP cadastrado pro vilão (vilao.getXpRecompensa()); se o banco não tiver
-            // esse valor preenchido (0), cai num valor padrão crescente por episódio para
-            // que a recompensa não fique nula mesmo com dados incompletos no banco.
             if (jogador != null) {
                 int xpGanho = (vilao.getXpRecompensa() > 0) ? vilao.getXpRecompensa() : (episodioResolvido * 50);
                 jogador.adicionarXp(xpGanho);
@@ -639,37 +637,33 @@ public class GameplayController implements Initializable {
                 }
             }
 
-            // BUG CORRIGIDO: vencer o vilão só atualizava flags em memória no objeto
-            // Jogador (setDerrotouAbutre/Shocker/Lagarto), mas nada gravava isso no
-            // banco na tabela fases_progresso, que é o que o ModoHistoriaController
-            // realmente lê para decidir quais episódios mostrar desbloqueados. Por
-            // isso vencer o episódio 1 nunca liberava o episódio 2 na tela de
-            // seleção. Aqui chamamos FaseProgressoDAO.desbloquearEpisodio() para o
-            // PRÓXIMO episódio (episodioResolvido + 1), que é o método que já existe
-            // no DAO para isso.
-            //
-            // BUG CORRIGIDO: pelo mesmo motivo, o XP ganho com adicionarXp() só existia
-            // em memória - nunca era salvo, por isso "zerar o jogo" sempre mostrava XP 0.
-            // Agora chamamos JogadorDAO.atualizar(jogador), que já salva xp_atual, hp_atual
-            // e nivel_atual de uma vez. Ambas as gravações rodam na mesma thread em segundo
-            // plano, para não travar a animação de vitória esperando o banco responder.
+            // CORREÇÃO DO ITEM 2: Avançar o nível do Modo História antes de salvar
             int proximoEpisodio = episodioResolvido + 1;
+            
             if (jogador != null) {
+                String vilaoLogado = SessaoJogo.get().getVilaoAtual();
+                boolean entrouPelaTeiaDeConfrontos = vilaoLogado != null && !vilaoLogado.isEmpty();
+                
+                // Só atualiza o nível atual se NÃO for a Teia de Confrontos
+                if (!entrouPelaTeiaDeConfrontos && proximoEpisodio <= 3) {
+                    jogador.setNivelAtual(proximoEpisodio);
+                }
+
                 final int idJogadorFinal = jogador.getIdJogador();
                 final Jogador jogadorParaSalvar = jogador;
                 final int proximoEpisodioFinal = proximoEpisodio;
+                final boolean isTeia = entrouPelaTeiaDeConfrontos;
+
                 Thread threadGravacao = new Thread(() -> {
                     try {
                         new JogadorDAO().atualizar(jogadorParaSalvar);
+                        
+                        // Salva o progresso e desbloqueia a fase se for Modo História
+                        if (!isTeia && proximoEpisodioFinal <= 3) {
+                            new FaseProgressoDAO().desbloquearEpisodio(idJogadorFinal, proximoEpisodioFinal);
+                        }
                     } catch (SQLException ex) {
                         System.err.println("Erro ao salvar progresso do jogador (XP/HP/nivel): " + ex.getMessage());
-                    }
-                    if (proximoEpisodioFinal <= 3) {
-                        try {
-                            new FaseProgressoDAO().desbloquearEpisodio(idJogadorFinal, proximoEpisodioFinal);
-                        } catch (SQLException ex) {
-                            System.err.println("Erro ao desbloquear episodio " + proximoEpisodioFinal + ": " + ex.getMessage());
-                        }
                     }
                 });
                 threadGravacao.setDaemon(true);
@@ -686,6 +680,7 @@ public class GameplayController implements Initializable {
             vitoriaDelay.play();
             return;
         }
+// ==================== FIM DO BLOCO CORRIGIDO ====================
 
         Timeline delay = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> iniciarTurnoInimigo()));
         delay.play();
@@ -768,8 +763,6 @@ public class GameplayController implements Initializable {
             public void handle(long now) {
                 tempoDecorrido += 0.016;
 
-                // Velocidade de esquiva aumentada (4.0 -> 5.5): combinado com a frequência
-                // reduzida dos ataques do Shocker/Lagarto, dá tempo real de reagir e desviar.
                 double velocidadePlayer = 5.5;
                 if (iconeCoracaoAranha != null && caixaCombateUndertale != null) {
                     double margemSeguranca = 6.0;
