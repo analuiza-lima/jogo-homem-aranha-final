@@ -12,175 +12,465 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<!--
-  ESTRUTURA DE LETTERBOX:
-  raizExterna (StackPane, preenche a janela inteira, fundo preto = as "barras" do letterbox)
-    -> palco (AnchorPane fx:id="palco", tamanho FIXO 900x700, escalado via ScaleTransform no controller)
-       -> todo o conteúdo original do jogo mora aqui dentro, sem alterar nenhuma coordenada interna.
-  Isso garante que nada fique torto/deformado: o palco sempre mantém proporção 900x700,
-  só aumenta/diminui de tamanho (scale uniforme) conforme a janela é redimensionada.
--->
-<StackPane fx:id="raizExterna" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.entreSombrasETeias.controller.GameplayController">
-   <children>
-      <AnchorPane fx:id="palco" prefHeight="700.0" prefWidth="900.0" minHeight="700.0" minWidth="900.0" maxHeight="700.0" maxWidth="900.0" style="-fx-background-color: #000000;">
-         <children>
+<StackPane fx:id="raizExterna"
+           style="-fx-background-color: #000000;"
+           prefWidth="900.0" prefHeight="700.0"
+           maxWidth="Infinity" maxHeight="Infinity"
+           xmlns="http://javafx.com/javafx/13"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.mycompany.entreSombrasETeias.controller.GameplayController">
 
-            <ImageView fx:id="imgBackground" fitHeight="700.0" fitWidth="900.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+    <children>
 
-            <VBox alignment="TOP_CENTER" spacing="15.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="15.0">
-               <children>
+        <AnchorPane fx:id="palco"
+                    prefHeight="700.0" prefWidth="900.0"
+                    minHeight="700.0" minWidth="900.0"
+                    maxHeight="700.0" maxWidth="900.0"
+                    style="-fx-background-color: #000000;">
 
-                  <VBox alignment="CENTER" spacing="5.0">
-                     <children>
-                        <Label fx:id="labelVilaoNome" text="VILÃO" textFill="WHITE">
-                           <font><Font name="Courier New Bold" size="20.0" /></font>
+            <children>
+
+                <!-- BACKGROUND -->
+                <ImageView fx:id="imgBackground"
+                           fitHeight="700.0"
+                           fitWidth="900.0"
+                           pickOnBounds="true"
+                           AnchorPane.bottomAnchor="0.0"
+                           AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0"
+                           AnchorPane.topAnchor="0.0" />
+
+                <!-- HUD DO JOGADOR (HP + LVL DIFICULDADE) -->
+                <VBox alignment="CENTER_LEFT"
+                      spacing="4.0"
+                      AnchorPane.topAnchor="15.0"
+                      AnchorPane.leftAnchor="20.0">
+
+                    <children>
+
+                        <Label fx:id="labelHpJogador"
+                               text="HP: 100/100"
+                               textFill="WHITE">
+                            <font>
+                                <Font name="Courier New Bold" size="14.0"/>
+                            </font>
                         </Label>
-                        <ProgressBar fx:id="barraHpVilao" minHeight="15.0" prefWidth="350.0" progress="1.0" style="-fx-accent: #ff0000;" />
 
-                        <AnchorPane prefHeight="160.0" prefWidth="800.0">
-                           <children>
-                              <ImageView fx:id="imgVilao" fitHeight="150.0" fitWidth="200.0" layoutX="300.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+                        <ProgressBar fx:id="barraHpJogador"
+                                     minHeight="12.0"
+                                     prefWidth="180.0"
+                                     progress="1.0"
+                                     style="-fx-accent: #22cc44;" />
 
-                              <Label fx:id="labelDanoPopup" layoutX="520.0" layoutY="60.0" text="-45 HP" textFill="RED" visible="false">
-                                 <font><Font name="Courier New Bold" size="28.0" /></font>
-                              </Label>
-
-                              <AnchorPane fx:id="painelBalaoVilao" layoutX="520.0" layoutY="5.0" prefHeight="60.0" prefWidth="160.0" style="-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #000000;" visible="false">
-                                 <children>
-                                    <Label fx:id="labelDialogoVilao" alignment="CENTER" layoutX="5.0" layoutY="5.0" prefHeight="50.0" prefWidth="150.0" text="Renda-se!" textFill="BLACK" wrapText="true">
-                                       <font><Font name="Courier New Bold" size="12.0" /></font>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                           </children>
-                        </AnchorPane>
-                     </children>
-                  </VBox>
-
-                  <StackPane alignment="CENTER">
-                     <children>
-                        <AnchorPane fx:id="caixaCombateUndertale" maxHeight="180.0" maxWidth="650.0" minHeight="180.0" minWidth="650.0" prefHeight="180.0" prefWidth="650.0" style="-fx-border-color: #ffffff; -fx-border-width: 4; -fx-background-color: #050505;" focusTraversable="true">
-                           <children>
-                              <ImageView fx:id="iconeCoracaoAranha" fitHeight="45.0" fitWidth="45.0" layoutX="302.0" layoutY="68.0" pickOnBounds="true" preserveRatio="true" />
-                           </children>
-                        </AnchorPane>
-                     </children>
-                  </StackPane>
-
-                  <StackPane prefHeight="100.0">
-                     <children>
-                        <AnchorPane fx:id="painelNarrativaCenario" maxHeight="100.0" maxWidth="650.0" prefHeight="100.0" prefWidth="650.0" style="-fx-background-color: rgba(0,0,0,0.9); -fx-border-color: #ffffff; -fx-border-width: 3;">
-                           <children>
-                              <ImageView fx:id="imgPeterIcone" fitHeight="70.0" fitWidth="70.0" layoutX="15.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true" />
-                              <Label fx:id="labelDialogoDinamico" alignment="TOP_LEFT" layoutX="100.0" layoutY="15.0" prefHeight="70.0" prefWidth="380.0" text="Carregando introdução..." textFill="WHITE" wrapText="true">
-                                 <font><Font name="Courier New Bold" size="15.0" /></font>
-                              </Label>
-                              <Button fx:id="btnAvancarDialogo" layoutX="500.0" layoutY="30.0" mnemonicParsing="false" onAction="#avancarDialogo" prefHeight="40.0" prefWidth="130.0" style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff; -fx-cursor: hand;" text="CONTINUAR ➔">
-                                 <font><Font name="Courier New Bold" size="11.0" /></font>
-                              </Button>
-                           </children>
-                        </AnchorPane>
-
-                        <!--
-                           PAINEL DO MINIGAME DE ATAQUE - estilo Undertale, fiel ao wireframe:
-                           faixa horizontal com zonas VERMELHO | AMARELO | VERDE(centro fino) | AMARELO | VERMELHO
-                           e um marcador (linha verde vertical) que se move da esquerda pra direita e volta.
-                           Tudo desenhado em código (ver método construirHitboxRitmo no controller),
-                           os Rectangles abaixo são apenas placeholders/contêiner.
-                        -->
-                        <AnchorPane fx:id="painelMinigameAtaque" maxHeight="100.0" maxWidth="650.0" prefHeight="100.0" prefWidth="650.0" style="-fx-background-color: #151515; -fx-border-color: #00ff00; -fx-border-width: 2;" visible="false">
-                           <children>
-                              <AnchorPane fx:id="containerHitbox" layoutX="25.0" layoutY="20.0" prefHeight="60.0" prefWidth="600.0" />
-                              <Region fx:id="barraMarcadorRitmo" layoutX="25.0" layoutY="15.0" prefHeight="70.0" prefWidth="6.0" style="-fx-background-color: #00ff66;" />
-                           </children>
-                        </AnchorPane>
-                     </children>
-                  </StackPane>
-
-                  <Label fx:id="labelStatusTurno" alignment="CENTER" prefWidth="650.0" text="* O que o Aranha vai fazer?" textFill="YELLOW">
-                     <font><Font name="Courier New Bold" size="16.0" /></font>
-                  </Label>
-
-                  <StackPane prefHeight="45.0">
-                     <children>
-                        <HBox fx:id="painelBotoesLuta" alignment="CENTER" spacing="30.0">
-                           <children>
-                              <Button fx:id="btnAtacarAranha" mnemonicParsing="false" onAction="#mostrarOpcoesAtaque" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #ff3333; -fx-border-width: 2; -fx-text-fill: #ff3333; -fx-cursor: hand;" text="⚔ ATACAR">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                              <Button fx:id="btnRecuperar" mnemonicParsing="false" onAction="#mostrarOpcoesRecuperar" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #33cc33; -fx-border-width: 2; -fx-text-fill: #33cc33; -fx-cursor: hand;" text="⭐ RECUPERAR">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                              <Button fx:id="btnFugir" mnemonicParsing="false" onAction="#executarFugir" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #ffffff; -fx-border-width: 2; -fx-text-fill: #ffffff; -fx-cursor: hand;" text="🏃 FUGIR">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                           </children>
-                        </HBox>
-
-                        <HBox fx:id="painelSubAtaques" alignment="CENTER" spacing="30.0" visible="false">
-                           <children>
-                              <Button fx:id="btnAtaqueOnda" mnemonicParsing="false" onAction="#iniciarMinigameOnda" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #ff3333; -fx-border-width: 2; -fx-text-fill: #ff3333; -fx-cursor: hand;" text="🥊 GOLPE">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                              <Button fx:id="btnAtaqueSuper" mnemonicParsing="false" onAction="#iniciarMinigameSuper" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #ff3333; -fx-border-width: 2; -fx-text-fill: #ff3333; -fx-cursor: hand;" text="💥 SUPER (0%)">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                              <Button fx:id="btnVoltarAtaque" mnemonicParsing="false" onAction="#voltarParaMenuLuta" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #ffffff; -fx-border-width: 2; -fx-text-fill: #ffffff; -fx-cursor: hand;" text="↩ VOLTAR">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                           </children>
-                        </HBox>
-
-                        <HBox fx:id="painelSubRecuperar" alignment="CENTER" spacing="30.0" visible="false">
-                           <children>
-                              <Button fx:id="btnSentidoAranha" mnemonicParsing="false" onAction="#usarSentidoAranha" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #33cc33; -fx-border-width: 2; -fx-text-fill: #33cc33; -fx-cursor: hand;" text="🕸 SENTIDO (+15)">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                              <Button fx:id="btnSuplemento" mnemonicParsing="false" onAction="#usarSuplemento" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #33cc33; -fx-border-width: 2; -fx-text-fill: #33cc33; -fx-cursor: hand;" text="🥤 SUPLEMENTO (3)">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                              <Button fx:id="btnVoltarRecuperar" mnemonicParsing="false" onAction="#voltarParaMenuLuta" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #000000; -fx-border-color: #ffffff; -fx-border-width: 2; -fx-text-fill: #ffffff; -fx-cursor: hand;" text="↩ VOLTAR">
-                                 <font><Font name="Courier New Bold" size="16.0" /></font>
-                              </Button>
-                           </children>
-                        </HBox>
-                     </children>
-                  </StackPane>
-
-                  <HBox alignment="CENTER" spacing="50.0">
-                     <children>
-                        <Label fx:id="labelLvlJogador" text="DIFICULDADE VILÃO: LVL 1" textFill="WHITE">
-                           <font><Font name="Courier New Bold" size="14.0" /></font>
+                        <Label fx:id="labelLvlJogador"
+                               text="DIFICULDADE VILÃO: LVL 1"
+                               textFill="#cccccc">
+                            <font>
+                                <Font name="Courier New Bold" size="11.0"/>
+                            </font>
                         </Label>
-                        <HBox alignment="CENTER" spacing="10.0">
-                           <children>
-                              <Label fx:id="labelHpJogador" text="HP: 100/100" textFill="WHITE">
-                                 <font><Font name="Courier New Bold" size="14.0" /></font>
-                              </Label>
-                              <ProgressBar fx:id="barraHpJogador" prefWidth="180.0" progress="1.0" style="-fx-accent: #00ff00;" />
-                           </children>
+
+                    </children>
+
+                </VBox>
+
+                <VBox alignment="TOP_CENTER"
+                      spacing="15.0"
+                      AnchorPane.bottomAnchor="10.0"
+                      AnchorPane.leftAnchor="50.0"
+                      AnchorPane.rightAnchor="50.0"
+                      AnchorPane.topAnchor="15.0">
+
+                    <children>
+
+                        <!-- HP VILÃO -->
+                        <VBox alignment="CENTER" spacing="5.0">
+
+                            <children>
+
+                                <ProgressBar fx:id="barraHpVilao"
+                                             minHeight="15.0"
+                                             prefWidth="350.0"
+                                             progress="1.0"
+                                             style="-fx-accent: #ff0000;" />
+
+                                <AnchorPane prefHeight="120.0" prefWidth="800.0">
+
+                                    <children>
+
+                                        <ImageView fx:id="imgVilao"
+                                                   fitHeight="115.0"
+                                                   fitWidth="155.0"
+                                                   layoutX="322.0"
+                                                   layoutY="2.0"
+                                                   pickOnBounds="true"
+                                                   preserveRatio="true" />
+
+                                        <Label fx:id="labelDanoPopup"
+                                               layoutX="520.0"
+                                               layoutY="45.0"
+                                               text="-45 HP"
+                                               textFill="RED"
+                                               visible="false">
+
+                                            <font>
+                                                <Font name="Courier New Bold" size="28.0"/>
+                                            </font>
+
+                                        </Label>
+
+                                        <!-- BALÃO VILÃO (CORRIGIDO) -->
+                                        <AnchorPane fx:id="painelBalaoVilao"
+                                                    layoutX="500.0"
+                                                    layoutY="0.0"
+                                                    prefHeight="90.0"
+                                                    prefWidth="230.0"
+                                                    style="-fx-background-color:white; -fx-border-color:black; -fx-border-width:2; -fx-background-radius:10;">
+
+                                            <children>
+
+                                                <Label fx:id="labelDialogoVilao"
+                                                       layoutX="10.0"
+                                                       layoutY="8.0"
+                                                       prefHeight="72.0"
+                                                       prefWidth="210.0"
+                                                       text="Renda-se!"
+                                                       textFill="BLACK"
+                                                       wrapText="true">
+
+                                                    <font>
+                                                        <Font name="Courier New Bold" size="12.0"/>
+                                                    </font>
+
+                                                </Label>
+
+                                            </children>
+
+                                        </AnchorPane>
+
+                                    </children>
+
+                                </AnchorPane>
+
+                            </children>
+
+                        </VBox>
+
+                        <!-- CAIXA DE COMBATE -->
+                        <StackPane alignment="CENTER">
+
+                            <children>
+
+                                <AnchorPane fx:id="caixaCombateUndertale"
+                                            maxHeight="180.0"
+                                            maxWidth="650.0"
+                                            minHeight="180.0"
+                                            minWidth="650.0"
+                                            prefHeight="180.0"
+                                            prefWidth="650.0"
+                                            style="-fx-border-color: #ffffff; -fx-border-width: 4; -fx-background-color: #050505;"
+                                            focusTraversable="true">
+
+                                    <children>
+
+                                        <ImageView fx:id="iconeCoracaoAranha"
+                                                   fitHeight="45.0"
+                                                   fitWidth="45.0"
+                                                   layoutX="302.0"
+                                                   layoutY="68.0"
+                                                   pickOnBounds="true"
+                                                   preserveRatio="true" />
+
+                                    </children>
+
+                                </AnchorPane>
+
+                            </children>
+
+                        </StackPane>
+
+                        <!-- NARRATIVA / MINIGAME -->
+                        <StackPane prefHeight="130.0">
+
+                            <children>
+
+                                <AnchorPane fx:id="painelNarrativaCenario"
+                                            maxHeight="130.0"
+                                            maxWidth="650.0"
+                                            prefHeight="130.0"
+                                            prefWidth="650.0"
+                                            style="-fx-background-color: rgba(0,0,0,0.9); -fx-border-color: #ffffff; -fx-border-width: 3;">
+
+                                    <children>
+
+                                        <ImageView fx:id="imgPeterIcone"
+                                                   fitHeight="70.0"
+                                                   fitWidth="70.0"
+                                                   layoutX="15.0"
+                                                   layoutY="15.0"
+                                                   pickOnBounds="true"
+                                                   preserveRatio="true" />
+
+                                        <Label fx:id="labelDialogoDinamico"
+                                               layoutX="100.0"
+                                               layoutY="12.0"
+                                               prefHeight="100.0"
+                                               prefWidth="535.0"
+                                               text="Carregando introdução..."
+                                               textFill="WHITE"
+                                               wrapText="true">
+
+                                            <font>
+                                                <Font name="Courier New Bold" size="14.0"/>
+                                            </font>
+
+                                        </Label>
+
+                                        <Button fx:id="btnAvancarDialogo"
+                                                layoutX="500.0"
+                                                layoutY="90.0"
+                                                mnemonicParsing="false"
+                                                onAction="#avancarDialogo"
+                                                prefHeight="32.0"
+                                                prefWidth="130.0"
+                                                style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                                text="CONTINUAR ➔">
+
+                                            <font>
+                                                <Font name="Courier New Bold" size="11.0"/>
+                                            </font>
+
+                                        </Button>
+
+                                    </children>
+
+                                </AnchorPane>
+
+                                <!-- MINIGAME -->
+                                <AnchorPane fx:id="painelMinigameAtaque"
+                                            maxHeight="130.0"
+                                            maxWidth="650.0"
+                                            prefHeight="130.0"
+                                            prefWidth="650.0"
+                                            style="-fx-background-color: #151515; -fx-border-color: #00ff00; -fx-border-width: 2;"
+                                            visible="false">
+
+                                    <children>
+
+                                        <AnchorPane fx:id="containerHitbox"
+                                                    layoutX="25.0"
+                                                    layoutY="35.0"
+                                                    prefHeight="60.0"
+                                                    prefWidth="600.0" />
+
+                                        <Region fx:id="barraMarcadorRitmo"
+                                                layoutX="25.0"
+                                                layoutY="30.0"
+                                                prefHeight="70.0"
+                                                prefWidth="6.0"
+                                                style="-fx-background-color: #00ff66;" />
+
+                                    </children>
+
+                                </AnchorPane>
+
+                            </children>
+
+                        </StackPane>
+
+                        <!-- STATUS -->
+                        <Label fx:id="labelStatusTurno"
+                               alignment="CENTER"
+                               prefWidth="650.0"
+                               text="* O que o Aranha vai fazer?"
+                               textFill="YELLOW">
+
+                            <font>
+                                <Font name="Courier New Bold" size="16.0"/>
+                            </font>
+
+                        </Label>
+
+                        <!-- ===================== MENU DE LUTA (PRINCIPAL) ===================== -->
+                        <HBox fx:id="painelBotoesLuta"
+                              alignment="CENTER"
+                              spacing="15.0"
+                              prefWidth="650.0">
+
+                            <children>
+
+                                <Button fx:id="btnAtacarAranha"
+                                        mnemonicParsing="false"
+                                        onAction="#mostrarOpcoesAtaque"
+                                        prefHeight="40.0"
+                                        prefWidth="140.0"
+                                        style="-fx-background-color: #8b0000; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="⚔ ATACAR">
+                                    <font>
+                                        <Font name="Courier New Bold" size="13.0"/>
+                                    </font>
+                                </Button>
+
+                                <Button fx:id="btnRecuperar"
+                                        mnemonicParsing="false"
+                                        onAction="#mostrarOpcoesRecuperar"
+                                        prefHeight="40.0"
+                                        prefWidth="140.0"
+                                        style="-fx-background-color: #0a5c0a; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="✚ RECUPERAR">
+                                    <font>
+                                        <Font name="Courier New Bold" size="13.0"/>
+                                    </font>
+                                </Button>
+
+                                <Button fx:id="btnFugir"
+                                        mnemonicParsing="false"
+                                        onAction="#executarFugir"
+                                        prefHeight="40.0"
+                                        prefWidth="140.0"
+                                        style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="🏃 FUGIR">
+                                    <font>
+                                        <Font name="Courier New Bold" size="13.0"/>
+                                    </font>
+                                </Button>
+
+                            </children>
+
                         </HBox>
-                     </children>
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </HBox>
 
-               </children>
-            </VBox>
+                        <!-- ===================== SUBMENU: ATAQUES ===================== -->
+                        <HBox fx:id="painelSubAtaques"
+                              alignment="CENTER"
+                              spacing="15.0"
+                              prefWidth="650.0"
+                              visible="false">
 
-            <VBox fx:id="telaGameOver" alignment="CENTER" spacing="20.0" style="-fx-background-color: rgba(0,0,0,0.92);" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-               <children>
-                  <Label text="VOCÊ FOI DERROTADO" textFill="RED">
-                     <font><Font name="Courier New Bold" size="32.0" /></font>
-                  </Label>
-                  <Button mnemonicParsing="false" onAction="#voltarMenuInicial" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #000000; -fx-border-color: #ffffff; -fx-border-width: 2; -fx-text-fill: #ffffff; -fx-cursor: hand;" text="VOLTAR AO MENU">
-                     <font><Font name="Courier New Bold" size="14.0" /></font>
-                  </Button>
-               </children>
-            </VBox>
+                            <children>
 
-         </children>
-      </AnchorPane>
-   </children>
+                                <Button fx:id="btnOndaImpacto"
+                                        mnemonicParsing="false"
+                                        onAction="#iniciarMinigameOnda"
+                                        prefHeight="40.0"
+                                        prefWidth="160.0"
+                                        style="-fx-background-color: #8b0000; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="🥊 GOLPE RÁPIDO">
+                                    <font>
+                                        <Font name="Courier New Bold" size="12.0"/>
+                                    </font>
+                                </Button>
+
+                                <Button fx:id="btnAtaqueSuper"
+                                        mnemonicParsing="false"
+                                        onAction="#iniciarMinigameSuper"
+                                        prefHeight="40.0"
+                                        prefWidth="180.0"
+                                        style="-fx-background-color: #4b0082; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="💥 SUPER (0%)">
+                                    <font>
+                                        <Font name="Courier New Bold" size="12.0"/>
+                                    </font>
+                                </Button>
+
+                                <Button mnemonicParsing="false"
+                                        onAction="#voltarParaMenuLuta"
+                                        prefHeight="40.0"
+                                        prefWidth="100.0"
+                                        style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="◀ VOLTAR">
+                                    <font>
+                                        <Font name="Courier New Bold" size="12.0"/>
+                                    </font>
+                                </Button>
+
+                            </children>
+
+                        </HBox>
+
+                        <!-- ===================== SUBMENU: RECUPERAR ===================== -->
+                        <HBox fx:id="painelSubRecuperar"
+                              alignment="CENTER"
+                              spacing="15.0"
+                              prefWidth="650.0"
+                              visible="false">
+
+                            <children>
+
+                                <Button mnemonicParsing="false"
+                                        onAction="#usarSentidoAranha"
+                                        prefHeight="40.0"
+                                        prefWidth="180.0"
+                                        style="-fx-background-color: #0a5c0a; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="🕸 SENTIDO ARANHA (+15)">
+                                    <font>
+                                        <Font name="Courier New Bold" size="11.0"/>
+                                    </font>
+                                </Button>
+
+                                <Button fx:id="btnSuplemento"
+                                        mnemonicParsing="false"
+                                        onAction="#usarSuplemento"
+                                        prefHeight="40.0"
+                                        prefWidth="180.0"
+                                        style="-fx-background-color: #0a5c0a; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="🥤 SUPLEMENTO (0)">
+                                    <font>
+                                        <Font name="Courier New Bold" size="11.0"/>
+                                    </font>
+                                </Button>
+
+                                <Button mnemonicParsing="false"
+                                        onAction="#voltarParaMenuLuta"
+                                        prefHeight="40.0"
+                                        prefWidth="100.0"
+                                        style="-fx-background-color: #222222; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;"
+                                        text="◀ VOLTAR">
+                                    <font>
+                                        <Font name="Courier New Bold" size="12.0"/>
+                                    </font>
+                                </Button>
+
+                            </children>
+
+                        </HBox>
+
+                    </children>
+
+                </VBox>
+
+                <!-- GAME OVER -->
+                <VBox fx:id="telaGameOver"
+                      alignment="CENTER"
+                      spacing="20.0"
+                      style="-fx-background-color: rgba(0,0,0,0.92);"
+                      visible="false"
+                      AnchorPane.bottomAnchor="0.0"
+                      AnchorPane.leftAnchor="0.0"
+                      AnchorPane.rightAnchor="0.0"
+                      AnchorPane.topAnchor="0.0">
+
+                    <children>
+
+                        <Label text="VOCÊ FOI DERROTADO" textFill="RED">
+                            <font>
+                                <Font name="Courier New Bold" size="32.0"/>
+                            </font>
+                        </Label>
+
+                        <Button text="VOLTAR AO MENU"
+                                onAction="#voltarMenuInicial"
+                                style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: white;"
+                                prefWidth="200.0"
+                                prefHeight="40.0"/>
+
+                    </children>
+
+                </VBox>
+
+            </children>
+
+        </AnchorPane>
+
+    </children>
+
 </StackPane>

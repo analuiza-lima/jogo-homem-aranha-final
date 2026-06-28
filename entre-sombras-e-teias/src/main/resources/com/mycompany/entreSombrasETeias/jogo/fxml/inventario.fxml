@@ -1,70 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
 <?import java.net.URL?>
-
 <AnchorPane prefWidth="650" prefHeight="650"
-            styleClass="inventario-root"
+            styleClass="inventario-fundo"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.mycompany.entreSombrasETeias.controller.InventarioController">
-
     <stylesheets>
         <URL value="@../css/estilo.css"/>
     </stylesheets>
-
     <children>
 
-        <Label
-                layoutX="185"
-                layoutY="30"
-                text="INVENTÁRIO"
-                styleClass="titulo-inventario"/>
+        <!-- ===================== JANELA PRINCIPAL (preta, borda branca grossa) ===================== -->
+        <AnchorPane styleClass="inventario-janela"
+                    layoutX="25" layoutY="25"
+                    prefWidth="600" prefHeight="600">
+            <children>
 
-        <Label
-                fx:id="labelHP"
-                layoutX="60"
-                layoutY="110"
-                styleClass="info"/>
+                <!-- Cantos decorativos pixelados (escadinha de 2 blocos, estilo wireframe) -->
+                <!-- Canto superior-esquerdo -->
+                <Region styleClass="canto-pixel-bloco" layoutX="2" layoutY="2" />
+                <Region styleClass="canto-pixel-bloco" layoutX="10" layoutY="10" />
+                <!-- Canto superior-direito -->
+                <Region styleClass="canto-pixel-bloco" layoutX="590" layoutY="2" />
+                <Region styleClass="canto-pixel-bloco" layoutX="582" layoutY="10" />
+                <!-- Canto inferior-esquerdo -->
+                <Region styleClass="canto-pixel-bloco" layoutX="2" layoutY="590" />
+                <Region styleClass="canto-pixel-bloco" layoutX="10" layoutY="582" />
+                <!-- Canto inferior-direito -->
+                <Region styleClass="canto-pixel-bloco" layoutX="590" layoutY="590" />
+                <Region styleClass="canto-pixel-bloco" layoutX="582" layoutY="582" />
 
-        <Label
-                fx:id="labelXP"
-                layoutX="420"
-                layoutY="110"
-                styleClass="info"/>
+                <!-- TÍTULO -->
+                <HBox alignment="CENTER" spacing="12" layoutX="0" layoutY="28" prefWidth="600">
+                    <children>
+                        <Label text="-" styleClass="titulo-inventario" />
+                        <ImageView fitWidth="22" fitHeight="22" preserveRatio="true"
+                                   styleClass="icone-aranha-titulo" />
+                        <Label text="INVENTÁRIO" styleClass="titulo-inventario" />
+                        <ImageView fitWidth="22" fitHeight="22" preserveRatio="true"
+                                   styleClass="icone-aranha-titulo" />
+                        <Label text="-" styleClass="titulo-inventario" />
+                    </children>
+                </HBox>
 
-        <Separator layoutX="50" layoutY="160" prefWidth="550"/>
+                <!-- LINHA HP / XP -->
+                <HBox alignment="CENTER_LEFT" spacing="10" layoutX="40" layoutY="92">
+                    <children>
+                        <ImageView fitWidth="20" fitHeight="20" preserveRatio="true"
+                                   styleClass="icone-coracao" />
+                        <Label fx:id="labelHP" text="HP: 30 / 30" styleClass="info" />
+                        <Region prefWidth="120" />
+                        <Label fx:id="labelXP" text="XP: 0" styleClass="info" />
+                    </children>
+                </HBox>
 
-        <Label
-                layoutX="60"
-                layoutY="175"
-                text="SUPLEMENTOS"
-                styleClass="subtitulo"/>
+                <!-- LINHA PONTILHADA SUPERIOR -->
+                <Region styleClass="linha-pontilhada" layoutX="40" layoutY="138" prefWidth="520" prefHeight="2" />
 
-        <ListView
-                fx:id="listaItens"
-                layoutX="60"
-                layoutY="220"
-                prefWidth="530"
-                prefHeight="250"
-                focusTraversable="false"/>
+                <!-- CAIXA DE SUPLEMENTOS (com rótulo "encaixado" na borda) -->
+                <AnchorPane styleClass="caixa-suplementos" layoutX="40" layoutY="168" prefWidth="520" prefHeight="290">
+                    <children>
+                        <Label text="SUPLEMENTOS" styleClass="rotulo-suplementos" layoutX="10" layoutY="-12" />
 
-        <Label
-                layoutX="120"
-                layoutY="500"
-                text="Cada suplemento restaura +15 HP."
-                styleClass="descricao"/>
+                        <ListView fx:id="listaItens"
+                                  layoutX="10" layoutY="14"
+                                  prefWidth="500" prefHeight="266"
+                                  focusTraversable="false" />
+                    </children>
+                </AnchorPane>
 
-        <Button
-                layoutX="250"
-                layoutY="555"
-                prefWidth="150"
-                prefHeight="45"
-                text="FECHAR"
-                onAction="#fechar"
-                styleClass="botao-pixel"/>
+                <!-- LINHA PONTILHADA INFERIOR -->
+                <Region styleClass="linha-pontilhada" layoutX="40" layoutY="478" prefWidth="520" prefHeight="2" />
+
+                <Label layoutX="0" layoutY="498" prefWidth="600" alignment="CENTER"
+                       text="Cada suplemento restaura +35 HP."
+                       styleClass="descricao" />
+
+                <Button layoutX="210" layoutY="535"
+                        prefWidth="180" prefHeight="42"
+                        text="FECHAR"
+                        onAction="#fechar"
+                        styleClass="botao-pixel" />
+
+            </children>
+        </AnchorPane>
 
     </children>
-
 </AnchorPane>

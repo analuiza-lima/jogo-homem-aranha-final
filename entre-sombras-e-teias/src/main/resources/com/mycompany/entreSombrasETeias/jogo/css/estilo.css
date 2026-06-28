@@ -277,3 +277,163 @@
 .botao-historia-navegacao-azul:hover {
     -fx-background-color: #0044cc;
 }
+
+
+/* ==========================================================================
+   INVENTÁRIO RETRÔ (REDESENHADO PARA SEGUIR O WIREFRAME PIXEL-ART)
+   ========================================================================== */
+
+/* Fundo externo da janela (visível nas bordas, atrás da caixa preta) -
+   wireframe mostra pedra com neve; sem essa imagem ainda, usamos um
+   gradiente azulado escuro que aproxima a paleta fria do wireframe. */
+.inventario-fundo {
+    -fx-background-color: linear-gradient(to bottom right, #2b3a55, #1a2438, #3d4f6e);
+}
+
+/* Caixa preta central com borda branca grossa (estrutura principal) */
+.inventario-janela {
+    -fx-background-color: #000000;
+    -fx-border-color: #ffffff;
+    -fx-border-width: 4px;
+}
+
+/* Cantos decorativos "encaixe" pixelado: pequena escadinha de 2 blocos
+   brancos por canto, aproximando o detalhe do wireframe. Cada canto usa
+   2 Region brancos no FXML (não apenas 1), então aqui só definimos o
+   tamanho-base do bloco pixelado; o posicionamento dos 2 blocos por
+   canto é feito via layoutX/layoutY direto no FXML. */
+.canto-pixel-bloco {
+    -fx-background-color: #ffffff;
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+}
+
+/* Título "INVENTÁRIO" com hífens e aranhas dos lados */
+.titulo-inventario {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 26px;
+    -fx-text-fill: white;
+}
+
+/* Ícones do título e da linha de status. Caso os arquivos PNG
+   (icon-coracao.png / icon-aranha-inventario.png) ainda não existam,
+   o ImageView simplesmente fica vazio sem quebrar o layout. */
+.icone-aranha-titulo {
+    -fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/aranha.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+}
+
+.icone-coracao {
+    -fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/coracao.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: contain;
+}
+
+.info {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 15px;
+    -fx-text-fill: white;
+}
+
+.subtitulo {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+}
+
+.descricao {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 11px;
+    -fx-text-fill: white;
+}
+
+/* Linha pontilhada separadora (substitui o Separator padrão, que não
+   tem suporte nativo a traço pontilhado customizado no JavaFX) */
+.linha-pontilhada {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-width: 0 0 2px 0;
+    -fx-border-style: segments(6, 4) line-cap round;
+}
+
+/* Caixa de suplementos: borda branca fina, fundo preto, com o rótulo
+   "SUPLEMENTOS" sobreposto na borda superior (estilo "aba" do wireframe) */
+.caixa-suplementos {
+    -fx-background-color: #000000;
+    -fx-border-color: #ffffff;
+    -fx-border-width: 2px;
+}
+
+.rotulo-suplementos {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-background-color: #000000;
+    -fx-padding: 0 8px 0 8px;
+}
+
+/* ---------- LISTVIEW ---------- */
+
+.list-view {
+    -fx-background-color: black;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.list-view .viewport {
+    -fx-background-color: black;
+}
+
+.list-cell {
+    -fx-background-color: black;
+    -fx-text-fill: #aaaaaa;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #202020;
+    -fx-text-fill: #00ff00;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #151515;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+
+/* ---------- SEPARATOR (mantido por compatibilidade com FXMLs antigos) ---------- */
+
+.separator .line {
+    -fx-border-color: white;
+    -fx-border-width: 1;
+}
+
+/* ---------- BOTÃO (com borda dupla, igual ao wireframe) ---------- */
+/* O wireframe mostra uma borda branca grossa por fora e um filete fino
+   por dentro, com um respiro preto entre as duas. -fx-border-width com
+   múltiplos valores + -fx-border-insets simula essa borda dupla sem
+   precisar de imagem ou de nó extra no FXML. */
+.botao-pixel {
+    -fx-background-color: black;
+    -fx-border-color: white, white;
+    -fx-border-width: 3px, 1px;
+    -fx-border-insets: 0, 6px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.botao-pixel:hover {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}

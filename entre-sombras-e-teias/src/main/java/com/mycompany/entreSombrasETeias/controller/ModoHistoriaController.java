@@ -22,9 +22,6 @@ public class ModoHistoriaController implements Initializable {
     @FXML private Button btnEp1;
     @FXML private Button btnEp2;
     @FXML private Button btnEp3;
-    @FXML private Button btnEp4;
-    @FXML private Button btnEp5;
-    @FXML private Button btnEp6;
     
     private int episodioSelecionado = 1;
     
@@ -42,7 +39,7 @@ private void carregarFases(int idJogador) {
     try {
         FaseProgressoDAO dao = new FaseProgressoDAO();
         List<FaseProgresso> fases = dao.listarPorJogador(idJogador);
-        Button[] botoes = {btnEp1, btnEp2, btnEp3, btnEp4, btnEp5, btnEp6};
+        Button[] botoes = {btnEp1, btnEp2, btnEp3};
         
         // 1. Reset inicial: Configura tudo como bloqueado usando APENAS classes CSS
         for (Button b : botoes) {
@@ -103,10 +100,7 @@ private void carregarFases(int idJogador) {
     @FXML public void jogarEp1() { selecionarEpisodio(1); }
     @FXML public void jogarEp2() { selecionarEpisodio(2); }
     @FXML public void jogarEp3() { selecionarEpisodio(3); }
-    @FXML public void jogarEp4() { selecionarEpisodio(4); }
-    @FXML public void jogarEp5() { selecionarEpisodio(5); }
-    @FXML public void jogarEp6() { selecionarEpisodio(6); }
-
+    
     @FXML public void abrirUpgrades() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/upgrades.fxml"); }
     @FXML public void abrirInventario(){ SceneManager.abrirNovoStage("/com/mycompany/entreSombrasETeias/jogo/fxml/inventario.fxml", "Inventário"); }
     @FXML public void voltarMenu() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml"); }

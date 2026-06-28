@@ -10,7 +10,7 @@ public class FaseProgressoDAO {
                    + "VALUES (?, ?, ?)";
         try (Connection con = ConexaoBD.conectar();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            for (int ep = 1; ep <= 6; ep++) {
+            for (int ep = 1; ep <= 3; ep++) {
                 ps.setInt(1, idJogador);
                 ps.setInt(2, ep);
                 ps.setBoolean(3, ep != 1); 

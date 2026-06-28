@@ -1,5 +1,7 @@
 package com.mycompany.entreSombrasETeias.controller;
 
+import com.mycompany.entreSombrasETeias.dao.FaseProgressoDAO;
+import com.mycompany.entreSombrasETeias.dao.JogadorDAO;
 import com.mycompany.entreSombrasETeias.dao.VilaoDAO;
 import com.mycompany.entreSombrasETeias.model.Jogador;
 import com.mycompany.entreSombrasETeias.model.Vilao;
@@ -21,7 +23,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -48,7 +49,6 @@ public class GameplayController implements Initializable {
     private static final double LARGURA_PALCO = 900.0;
     private static final double ALTURA_PALCO = 700.0;
 
-    @FXML private Label labelVilaoNome;
     @FXML private Label labelHpJogador;
     @FXML private Label labelLvlJogador;
     @FXML private Label labelStatusTurno;
@@ -94,61 +94,58 @@ public class GameplayController implements Initializable {
 
     // ----- Hitbox estilo Undertale (faixa horizontal: vermelho|amarelo|verde|amarelo|vermelho) -----
     private static final double HITBOX_LARGURA_TOTAL = 600.0;
-    private static final double HITBOX_X_INICIO = 25.0; // mesmo X do containerHitbox/barraMarcadorRitmo no FXML
+    private static final double HITBOX_X_INICIO = 25.0;
     private double posicaoMarcador = HITBOX_X_INICIO;
     private boolean indoParaDireita = true;
-    private double larguraFaixaVerde = 60.0; // recalculada conforme dificuldade do vilão
+    private double larguraFaixaVerde = 60.0;
 
     private int superAcumulado = 0;
     private String tipoAtaqueAtual = "ONDA";
 
     private int episodioResolvido = 1;
-   
 
     private List<javafx.scene.Node> elementosAtaqueAtivos = new ArrayList<>();
     private Random random = new Random();
 
-    // Matriz contendo o Contexto Narrativo seguido do Diálogo Obrigatório de cada chefe
-    // Apenas 3 episódios: ABUTRE, SHOCKER, LAGARTO
     private static final String[][] NARRATIVAS_E_DIALOGOS = {
-        // EPISÓDIO 1: ABUTRE
+        // EPISODIO 1: ABUTRE
         {
-            "NARRATIVA: Em mais uma de suas patrulhas noturnas, Peter observava a cidade do alto dos prédios.",
-            "NARRATIVA: Um vulto cruzou o céu rapidamente, carregando algo pesado.",
-            "NARRATIVA: Peter se aproximou em silêncio, tentando entender o que estava acontecendo.",
-            "NARRATIVA: As asas metálicas refletiram a luz da lua — definitivamente não era um pássaro.",
-            "NARRATIVA: Antes que pudesse reagir, a figura mergulhou em sua direção.",
-            "PETER: Ei, senhor… isso não é horário de voo autorizado.",
+            "NARRATIVA: Em mais uma de suas patrulhas noturnas, Peter observava a cidade do alto dos predios.",
+            "NARRATIVA: Um vulto cruzou o ceu rapidamente, carregando algo pesado.",
+            "NARRATIVA: Peter se aproximou em silencio, tentando entender o que estava acontecendo.",
+            "NARRATIVA: As asas metalicas refletiram a luz da lua - definitivamente nao era um passaro.",
+            "NARRATIVA: Antes que pudesse reagir, a figura mergulhou em sua direcao.",
+            "PETER: Ei, senhor... isso nao e horario de voo autorizado.",
             "VILAO: Eu voo quando quiser, garoto. E pego o que quiser.",
-            "PETER: Não se eu puder impedir!"
+            "PETER: Nao se eu puder impedir!"
         },
-        // EPISÓDIO 2: SHOCKER
+        // EPISODIO 2: SHOCKER
         {
-            "NARRATIVA: Durante uma ronda pelas ruas, Peter ouviu uma sequência de explosões abafadas.",
-            "NARRATIVA: Seguindo o som, encontrou uma loja parcialmente destruída.",
-            "NARRATIVA: No meio dos destroços, um homem com luvas estranhas disparava ondas pelo ar.",
-            "NARRATIVA: Cada impacto fazia o chão vibrar sob seus pés.",
-            "NARRATIVA: Quando Peter se aproximou, uma nova rajada veio direto na sua direção.",
+            "NARRATIVA: Durante uma ronda pelas ruas, Peter ouviu uma sequencia de explosoes abafadas.",
+            "NARRATIVA: Seguindo o som, encontrou uma loja parcialmente destruida.",
+            "NARRATIVA: No meio dos destrocos, um homem com luvas estranhas disparava ondas pelo ar.",
+            "NARRATIVA: Cada impacto fazia o chao vibrar sob seus pes.",
+            "NARRATIVA: Quando Peter se aproximou, uma nova rajada veio direto na sua direcao.",
             "VILAO: Hoje eu termino o que comecei, Homem-Aranha!",
-            "PETER: Você começou alguma coisa?",
+            "PETER: Voce comecou alguma coisa?",
             "VILAO: Vou te transformar em poeira!",
-            "PETER: Cara, você fala isso toda vez…",
-            "VILAO: E dessa vez é sério!",
-            "PETER: Tá bom, se você diz."
+            "PETER: Cara, voce fala isso toda vez...",
+            "VILAO: E dessa vez e serio!",
+            "PETER: Ta bom, se voce diz."
         },
-        // EPISÓDIO 3: LAGARTO
+        // EPISODIO 3: LAGARTO
         {
-            "NARRATIVA: Investigando relatos estranhos sobre uma criatura causando visível caos na cidade, Peter entrou em um laboratório aparentemente abandonado.",
+            "NARRATIVA: Investigando relatos estranhos sobre uma criatura causando visivel caos na cidade, Peter entrou em um laboratorio aparentemente abandonado.",
             "NARRATIVA: O lugar estava revirado, com equipamentos quebrados e marcas pelas paredes.",
-            "NARRATIVA: Entre os destroços, ele encontrou sinais de experimentos recentes.",
-            "NARRATIVA: Então a avistou… e a reconheceu na hora.",
-            "NARRATIVA: Antes que pudesse falar, o monstro avançou com violência.",
-            "PETER: Dr. Connors, você precisa lutar contra isso!",
-            "VILAO: CONNORS NÃO EXISTE MAIS!",
-            "PETER: Eu sei que ele ainda tá aí. Eu posso te ajudar.",
-            "VILAO: QUANTA ARROGÂNCIA VINDA DE UM INSETO PATÉTICO COMO VOCÊ!",
-            "PETER: Eu tô aqui tentando te salvar!",
-            "VILAO: VOCÊ NÃO CONSEGUE SALVAR NEM A SI MESMO, MOLEQUE! DESISTA!"
+            "NARRATIVA: Entre os destrocos, ele encontrou sinais de experimentos recentes.",
+            "NARRATIVA: Entao a avistou... e a reconheceu na hora.",
+            "NARRATIVA: Antes que pudesse falar, o monstro avancou com violencia.",
+            "PETER: Dr. Connors, voce precisa lutar contra isso!",
+            "VILAO: CONNORS NAO EXISTE MAIS!",
+            "PETER: Eu sei que ele ainda ta ai. Eu posso te ajudar.",
+            "VILAO: QUANTA ARROGANCIA VINDA DE UM INSETO PATETICO COMO VOCE!",
+            "PETER: Eu to aqui tentando te salvar!",
+            "VILAO: VOCE NAO CONSEGUE SALVAR NEM A SI MESMO, MOLEQUE! DESISTA!"
         }
     };
 
@@ -156,6 +153,8 @@ public class GameplayController implements Initializable {
     private String[] dialogoAtual;
 
     public void aplicarDanoNoVilao(int quantidadeDano) {
+        if (labelDanoPopup == null || imgVilao == null) return;
+
         labelDanoPopup.setText("-" + quantidadeDano + " HP");
         labelDanoPopup.setVisible(true);
 
@@ -178,7 +177,6 @@ public class GameplayController implements Initializable {
         );
         tremor.play();
 
-        // Trocado Thread.sleep por Timeline (evita criar Threads soltas e problemas de concorrência com a UI)
         Timeline resetEfeito = new Timeline(new KeyFrame(Duration.millis(900), e -> {
             labelDanoPopup.setVisible(false);
             imgVilao.setEffect(null);
@@ -188,6 +186,7 @@ public class GameplayController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
         jogador = SessaoJogo.get().getJogador();
         String vilaoLogado = SessaoJogo.get().getVilaoAtual();
 
@@ -201,28 +200,55 @@ public class GameplayController implements Initializable {
         } else {
             episodioResolvido = (jogador != null) ? jogador.getNivelAtual() : 1;
         }
-        // Garante que nunca passe de 3, já que só existem 3 episódios agora
         episodioResolvido = Math.max(1, Math.min(episodioResolvido, 3));
 
         try {
             vilao = new VilaoDAO().buscarPorEpisodio(episodioResolvido);
         } catch (SQLException e) {
+            vilao = null;
+        }
+
+        // Defesa extra: cobre tanto exception quanto DAO retornando null sem lancar erro.
+        if (vilao == null) {
             vilao = new Vilao();
             vilao.setHpMaximo(100);
             vilao.setHpAtual(100);
-            vilao.setNome(vilaoLogado != null ? vilaoLogado.toUpperCase() : "VILÃO");
+            vilao.setNome(vilaoLogado != null ? vilaoLogado.toUpperCase() : "VILAO");
         }
 
-        if (labelVilaoNome != null) labelVilaoNome.setText(vilao.getNome());
+        // Defesa extra: garante jogador valido mesmo se a sessao nao tiver sido preenchida.
+        // OBS: Jogador.getHpMaximo() e calculado a partir do nivel (100 + (nivel-1)*20),
+        // entao nao existe setHpMaximo() na classe - o construtor ja deixa hpAtual = hpMaximo.
+        if (jogador == null) {
+            jogador = new Jogador("Peter");
+        }
 
-        // 1. Carrega os elementos visuais do jogador
-        carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhacorrendo.gif");
+        // BUG CORRIGIDO (pedido do usuário): na Teia de Confrontos as lutas não seguem
+        // ordem cronológica (o jogador escolhe livremente qual vilão enfrentar), então
+        // terminar uma luta com HP baixo não deveria carregar pra próxima - cada confronto
+        // ali é independente. Isso só vale pro fluxo da Teia (vilaoLogado preenchido);
+        // no Modo História o HP continua acumulando entre episódios normalmente, pois ali
+        // a progressão é sequencial e faz sentido carregar o dano sofrido.
+        boolean entrouPelaTeiaDeConfrontos = vilaoLogado != null && !vilaoLogado.isEmpty();
+        if (entrouPelaTeiaDeConfrontos) {
+            jogador.setHpAtual(jogador.getHpMaximo());
+        }
+
+        // 1. Elementos visuais do jogador
+        carregarImagemComponente(iconeCoracaoAranha, "/com/mycompany/entreSombrasETeias/jogo/imagens/miranha.png");
         carregarImagemComponente(imgPeterIcone, "/com/mycompany/entreSombrasETeias/jogo/imagens/homem-aranha-tela-de-vilao.png");
 
-        // 2. Background
-        carregarImagemComponente(imgBackground, "/com/mycompany/entreSombrasETeias/jogo/imagens/gotham-city.png");
+        // 2. Background (agora varia por episódio - antes era sempre gotham-city.png
+        // mesmo nas lutas contra Shocker e Lagarto, que ganharam seus próprios cenários)
+        if (episodioResolvido == 2) {
+            carregarImagemComponente(imgBackground, "/com/mycompany/entreSombrasETeias/jogo/imagens/background-shocker.jpg");
+        } else if (episodioResolvido == 3) {
+            carregarImagemComponente(imgBackground, "/com/mycompany/entreSombrasETeias/jogo/imagens/background-lagarto.jpg");
+        } else {
+            carregarImagemComponente(imgBackground, "/com/mycompany/entreSombrasETeias/jogo/imagens/gotham-city.png");
+        }
 
-        // 3. Carregamento dos Sprites dos Vilões (apenas 3 episódios)
+        // 3. Sprites dos Vilões
         if (episodioResolvido == 1) {
             carregarImagemComponente(imgVilao, "/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-tela-de-vilao.png");
         } else if (episodioResolvido == 2) {
@@ -231,13 +257,12 @@ public class GameplayController implements Initializable {
             carregarImagemComponente(imgVilao, "/com/mycompany/entreSombrasETeias/jogo/imagens/lagarto-tela-de-vilao.png");
         }
 
-        // 4. Inicialização da cadeia de Diálogos
+        // 4. Cadeia de Diálogos
         int indiceVetor = Math.max(0, Math.min(episodioResolvido - 1, NARRATIVAS_E_DIALOGOS.length - 1));
         dialogoAtual = NARRATIVAS_E_DIALOGOS[indiceVetor];
         indiceDialogo = 0;
 
-        // 5. Dificuldade: faixa verde da hitbox encolhe conforme o episódio avança
-        // Episódio 1 -> faixa larga (mais fácil) | Episódio 3 -> faixa estreita (mais difícil)
+        // 5. Dificuldade da hitbox
         switch (episodioResolvido) {
             case 1:  larguraFaixaVerde = 70.0; break;
             case 2:  larguraFaixaVerde = 50.0; break;
@@ -245,36 +270,70 @@ public class GameplayController implements Initializable {
             default: larguraFaixaVerde = 60.0; break;
         }
 
-        // 6. Configuração e Bloqueio Inicial
+        // 6. Bloqueio inicial de UI
         setBotoesAcaoBloqueados(true);
-        if (painelBotoesLuta != null) painelBotoesLuta.setVisible(false);
+        alternarMenusSubinferiores(null);
         if (painelNarrativaCenario != null) painelNarrativaCenario.setVisible(true);
         if (telaGameOver != null) telaGameOver.setVisible(false);
+        if (labelStatusTurno != null) labelStatusTurno.setVisible(false);
+        if (painelMinigameAtaque != null) painelMinigameAtaque.setVisible(false);
 
-        // 7. Atualizações do sistema
+        // 7. Inicializações
         atualizarDialogo();
         atualizarUI();
         configurarLetterbox();
         configurarControleTeclado();
+
+        Platform.runLater(() -> {
+            if (caixaCombateUndertale != null && caixaCombateUndertale.getScene() != null) {
+                registrarHandlersDeTeclado(caixaCombateUndertale.getScene());
+            }
+        });
     }
 
-    // ===================== LETTERBOX (tela ajustável sem deformar/cortar) =====================
+    // ===================== LETTERBOX =====================
     private void configurarLetterbox() {
         if (palco == null || raizExterna == null) return;
 
-        Scale escala = new Scale(1, 1, 0, 0);
+        // Garante que o StackPane raiz sempre tente ocupar 100% da Scene,
+        // mesmo que o FXML não tenha sido configurado com maxWidth/maxHeight=Infinity.
+        // Sem isso, em alguns casos o root não cresce junto com a janela/fullscreen
+        // e a largura/altura usadas no cálculo da escala ficam erradas.
+        raizExterna.setMaxWidth(Double.MAX_VALUE);
+        raizExterna.setMaxHeight(Double.MAX_VALUE);
+
+        // BUG CORRIGIDO: a Scale usava pivô em (0,0) - o canto superior esquerdo do palco.
+        // Isso faz a escala "encolher" o conteúdo a partir do canto, enquanto o StackPane
+        // centraliza o palco baseado no tamanho de LAYOUT (900x700, sem escala). Resultado:
+        // um descompasso entre onde o StackPane acha que o palco está e onde ele realmente
+        // aparece na tela, gerando o deslocamento ("elementos tortos/fora do lugar") sempre
+        // que o fator de escala é diferente de 1 - ou seja, fora da tela cheia. Usando o
+        // pivô no CENTRO do palco (450,350 = metade de 900x700), a escala encolhe/cresce
+        // simetricamente a partir do centro, que é exatamente onde o StackPane já posiciona
+        // o palco - eliminando o deslocamento.
+        Scale escala = new Scale(1, 1, LARGURA_PALCO / 2.0, ALTURA_PALCO / 2.0);
         palco.getTransforms().add(escala);
 
-        // Recalcula a escala sempre que o container externo muda de tamanho.
-        // Usa Math.min para garantir letterbox: o palco nunca estica além do menor eixo,
-        // então nunca corta nada e nunca deforma a proporção 900x700.
         ChangeListener<Number> recalcular = (obs, oldV, newV) -> aplicarEscalaLetterbox(escala);
 
         raizExterna.widthProperty().addListener(recalcular);
         raizExterna.heightProperty().addListener(recalcular);
 
-        // Aplica uma vez assim que o nó estiver de fato na cena, com tamanho real conhecido
-        Platform.runLater(() -> aplicarEscalaLetterbox(escala));
+        // BUG CORRIGIDO: se o Stage entra/sai do fullscreen DEPOIS que esta tela já
+        // carregou (ex.: setFullScreen(true) chamado em outro momento do fluxo),
+        // o width/height do raizExterna pode levar um instante para refletir o novo
+        // tamanho, ou disparar antes do SO terminar a transição. Escutar diretamente
+        // a propriedade fullScreenProperty() do Stage garante um recálculo extra
+        // assim que a transição de tela cheia terminar.
+        Platform.runLater(() -> {
+            aplicarEscalaLetterbox(escala);
+            if (raizExterna.getScene() != null && raizExterna.getScene().getWindow() instanceof javafx.stage.Stage) {
+                javafx.stage.Stage stage = (javafx.stage.Stage) raizExterna.getScene().getWindow();
+                stage.fullScreenProperty().addListener((obs, oldV, newV) ->
+                    Platform.runLater(() -> aplicarEscalaLetterbox(escala))
+                );
+            }
+        });
     }
 
     private void aplicarEscalaLetterbox(Scale escala) {
@@ -292,34 +351,40 @@ public class GameplayController implements Initializable {
     private void carregarImagemComponente(ImageView iv, String path) {
         try {
             URL url = getClass().getResource(path);
-            if (url != null && iv != null) iv.setImage(new Image(url.toExternalForm()));
+            if (url != null && iv != null) {
+                iv.setImage(new Image(url.toExternalForm()));
+            } else {
+                System.out.println("Recurso nao encontrado: " + path);
+            }
         } catch (Exception e) {
-            System.out.println("Recurso não encontrado: " + path);
+            System.out.println("Erro ao carregar recurso: " + path + " -> " + e.getMessage());
         }
     }
 
     private void atualizarUI() {
-    if (jogador == null) return;
+        if (jogador == null) return;
 
-    int hpMax = jogador.getHpMaximo() > 0 ? jogador.getHpMaximo() : 100;
-    labelHpJogador.setText("HP: " + jogador.getHpAtual() + "/" + hpMax);
-    barraHpJogador.setProgress((double) jogador.getHpAtual() / hpMax);
-    labelLvlJogador.setText("DIFICULDADE VILÃO: LVL " + episodioResolvido);
+        int hpMax = jogador.getHpMaximo() > 0 ? jogador.getHpMaximo() : 100;
+        if (labelHpJogador != null) labelHpJogador.setText("HP: " + jogador.getHpAtual() + "/" + hpMax);
+        if (barraHpJogador != null) barraHpJogador.setProgress((double) jogador.getHpAtual() / hpMax);
+        if (labelLvlJogador != null) labelLvlJogador.setText("DIFICULDADE VILAO: LVL " + episodioResolvido);
 
-    if (vilao != null) {
-        barraHpVilao.setProgress((double) vilao.getHpAtual() / vilao.getHpMaximo());
+        if (vilao != null && barraHpVilao != null) {
+            int hpMaxVilao = vilao.getHpMaximo() > 0 ? vilao.getHpMaximo() : 1;
+            barraHpVilao.setProgress((double) vilao.getHpAtual() / hpMaxVilao);
+        }
+
+        if (btnAtaqueSuper != null) {
+            btnAtaqueSuper.setText("SUPER (" + Math.min(100, (superAcumulado * 100) / 120) + "%)");
+            btnAtaqueSuper.setDisable(superAcumulado < 120);
+        }
+
+        if (btnSuplemento != null) {
+            btnSuplemento.setText("SUPLEMENTO (" + jogador.getSuplementos() + ")");
+            btnSuplemento.setDisable(jogador.getSuplementos() == 0);
+        }
     }
 
-    if (btnAtaqueSuper != null) {
-        btnAtaqueSuper.setText("💥 SUPER (" + Math.min(100, (superAcumulado * 100) / 120) + "%)");
-        btnAtaqueSuper.setDisable(superAcumulado < 120);
-    }
-
-    if (btnSuplemento != null) {
-        btnSuplemento.setText("🥤 SUPLEMENTO (" + jogador.getSuplementos() + ")");
-        btnSuplemento.setDisable(jogador.getSuplementos() == 0);
-    }
-}
     @FXML
     public void avancarDialogo() {
         indiceDialogo++;
@@ -346,7 +411,8 @@ public class GameplayController implements Initializable {
                 if (painelNarrativaCenario != null) painelNarrativaCenario.setVisible(true);
                 if (labelDialogoDinamico != null) labelDialogoDinamico.setText("...");
                 if (painelBalaoVilao != null) painelBalaoVilao.setVisible(true);
-                if (labelDialogoVilao != null) labelDialogoVilao.setText(falaCompleta.replace("VILAO:", vilao.getNome() + ":"));
+                String nomeVilao = (vilao != null && vilao.getNome() != null) ? vilao.getNome() : "VILAO";
+                if (labelDialogoVilao != null) labelDialogoVilao.setText(falaCompleta.replace("VILAO:", nomeVilao + ":"));
             }
         } else {
             if (painelNarrativaCenario != null) painelNarrativaCenario.setVisible(false);
@@ -361,10 +427,12 @@ public class GameplayController implements Initializable {
         alternarMenusSubinferiores(painelBotoesLuta);
         if (labelStatusTurno != null) {
             labelStatusTurno.setVisible(true);
-            labelStatusTurno.setText("⭐ O que o Aranha vai fazer?");
+            labelStatusTurno.setText("O que o Aranha vai fazer?");
         }
         setBotoesAcaoBloqueados(false);
-        if (caixaCombateUndertale != null) caixaCombateUndertale.requestFocus();
+        if (caixaCombateUndertale != null) {
+            Platform.runLater(() -> caixaCombateUndertale.requestFocus());
+        }
     }
 
     private void alternarMenusSubinferiores(HBox painelAlvo) {
@@ -375,7 +443,15 @@ public class GameplayController implements Initializable {
 
     @FXML private void mostrarOpcoesAtaque() { alternarMenusSubinferiores(painelSubAtaques); }
     @FXML private void mostrarOpcoesRecuperar() { alternarMenusSubinferiores(painelSubRecuperar); }
-    @FXML public void voltarParaMenuLuta() { alternarMenusSubinferiores(painelBotoesLuta); }
+
+    @FXML
+    public void voltarParaMenuLuta() {
+        alternarMenusSubinferiores(painelBotoesLuta);
+        if (labelStatusTurno != null) {
+            labelStatusTurno.setVisible(true);
+            labelStatusTurno.setText("O que o Aranha vai fazer?");
+        }
+    }
 
     @FXML
     private void iniciarMinigameOnda() {
@@ -391,8 +467,7 @@ public class GameplayController implements Initializable {
         }
     }
 
-    // ===================== HITBOX ESTILO UNDERTALE (fiel ao wireframe) =====================
-    // Constrói a faixa: VERMELHO | AMARELO | VERDE(fino, centro) | AMARELO | VERMELHO
+    // ===================== HITBOX ESTILO UNDERTALE =====================
     private void construirHitboxRitmo() {
         if (containerHitbox == null) return;
         containerHitbox.getChildren().clear();
@@ -402,36 +477,29 @@ public class GameplayController implements Initializable {
         double centro = larguraTotal / 2.0;
 
         double meiaVerde = larguraFaixaVerde / 2.0;
-        double larguraAmarelo = 90.0; // faixa amarela de cada lado da verde
+        double larguraAmarelo = 90.0;
         double xVerdeInicio = centro - meiaVerde;
         double xVerdeFim = centro + meiaVerde;
         double xAmareloEsqInicio = Math.max(0, xVerdeInicio - larguraAmarelo);
         double xAmareloDirFim = Math.min(larguraTotal, xVerdeFim + larguraAmarelo);
 
-        // Vermelho esquerdo
         Rectangle vermelhoEsq = new Rectangle(0, 0, xAmareloEsqInicio, alturaFaixa);
         vermelhoEsq.setFill(Color.web("#cc1111"));
-        // Amarelo esquerdo
         Rectangle amareloEsq = new Rectangle(xAmareloEsqInicio, 0, xVerdeInicio - xAmareloEsqInicio, alturaFaixa);
         amareloEsq.setFill(Color.web("#e6c200"));
-        // Verde (centro fino - acerto perfeito)
         Rectangle verde = new Rectangle(xVerdeInicio, 0, larguraFaixaVerde, alturaFaixa);
         verde.setFill(Color.web("#22cc44"));
-        // Amarelo direito
         Rectangle amareloDir = new Rectangle(xVerdeFim, 0, xAmareloDirFim - xVerdeFim, alturaFaixa);
         amareloDir.setFill(Color.web("#e6c200"));
-        // Vermelho direito
         Rectangle vermelhoDir = new Rectangle(xAmareloDirFim, 0, larguraTotal - xAmareloDirFim, alturaFaixa);
         vermelhoDir.setFill(Color.web("#cc1111"));
 
-        // Bolinhas decorativas (igual ao padrão pontilhado do wireframe)
         for (Rectangle faixa : new Rectangle[]{vermelhoEsq, amareloEsq, vermelhoDir, amareloDir}) {
             faixa.setArcWidth(0);
         }
 
         containerHitbox.getChildren().addAll(vermelhoEsq, amareloEsq, verde, amareloDir, vermelhoDir);
 
-        // Garante que o marcador fique por cima de tudo
         if (barraMarcadorRitmo != null) {
             barraMarcadorRitmo.toFront();
         }
@@ -439,15 +507,19 @@ public class GameplayController implements Initializable {
 
     private void dispararLoopRitmo() {
         if (labelStatusTurno != null) labelStatusTurno.setVisible(false);
-        if (painelMinigameAtaque != null) painelMinigameAtaque.setVisible(true);
+        if (painelMinigameAtaque == null || caixaCombateUndertale == null || barraMarcadorRitmo == null) return;
+
         setBotoesAcaoBloqueados(true);
         if (painelSubAtaques != null) painelSubAtaques.setVisible(false);
-
+        painelMinigameAtaque.setVisible(true);
+        caixaCombateUndertale.setVisible(true);
         construirHitboxRitmo();
 
         posicaoMarcador = HITBOX_X_INICIO;
         indoParaDireita = true;
-        if (barraMarcadorRitmo != null) barraMarcadorRitmo.setLayoutX(posicaoMarcador);
+        barraMarcadorRitmo.setLayoutX(posicaoMarcador);
+
+        if (loopMinigame != null) loopMinigame.stop();
 
         loopMinigame = new AnimationTimer() {
             @Override
@@ -463,20 +535,13 @@ public class GameplayController implements Initializable {
                     posicaoMarcador -= velocidadeMovel;
                     if (posicaoMarcador <= limiteEsquerdo) { posicaoMarcador = limiteEsquerdo; indoParaDireita = true; }
                 }
-                if (barraMarcadorRitmo != null) barraMarcadorRitmo.setLayoutX(posicaoMarcador);
+                barraMarcadorRitmo.setLayoutX(posicaoMarcador);
             }
         };
         loopMinigame.start();
     }
 
-    // ===================== CONTROLE DE TECLADO (bug corrigido) =====================
-    // BUG ORIGINAL: o handler de teclado só era registrado dentro de um listener de
-    // sceneProperty(). Esse listener só dispara quando a propriedade MUDA de valor.
-    // Se a Scene já estivesse definida no momento do initialize() (o que é o caso normal
-    // em troca de tela via SceneManager, já que o Stage já tem uma Scene quando o FXML
-    // é carregado), o listener nunca executava e os botões UP/DOWN/LEFT/RIGHT/SPACE
-    // nunca eram capturados -> minigame de ataque nunca registrava o SPACE -> "ataque não funciona".
-    // CORREÇÃO: registra direto se a cena já existir, e também escuta futuras trocas de cena.
+    // ===================== CONTROLE DE TECLADO =====================
     private void configurarControleTeclado() {
         if (caixaCombateUndertale == null) return;
 
@@ -489,8 +554,6 @@ public class GameplayController implements Initializable {
     }
 
     private void registrarHandlersDeTeclado(Scene cena) {
-        // addEventFilter no nível da Scene garante que o jogo responda ao teclado
-        // independentemente de qual nó tem o foco no momento (botão, painel, etc).
         cena.addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, evento -> {
             switch (evento.getCode()) {
                 case UP:    cima = true; break;
@@ -529,22 +592,19 @@ public class GameplayController implements Initializable {
         int danoFinal = 0;
 
         if (margemErro <= meiaVerde) {
-            // Acerto perfeito (caiu na faixa verde central)
             danoFinal = tipoAtaqueAtual.equals("SUPER") ? 75 : 35;
-            if (labelStatusTurno != null) labelStatusTurno.setText("⭐ ACERTO PERFEITO!");
+            if (labelStatusTurno != null) labelStatusTurno.setText("ACERTO PERFEITO!");
             if (tipoAtaqueAtual.equals("ONDA")) {
                 superAcumulado = Math.min(120, superAcumulado + 40);
             } else {
                 superAcumulado = 0;
             }
         } else if (margemErro <= meiaVerde + 90.0) {
-            // Acerto bom (caiu na faixa amarela)
             danoFinal = tipoAtaqueAtual.equals("SUPER") ? 45 : 20;
-            if (labelStatusTurno != null) labelStatusTurno.setText("* Bom impacto! Causou " + danoFinal + " de dano.");
+            if (labelStatusTurno != null) labelStatusTurno.setText("Bom impacto! Causou " + danoFinal + " de dano.");
             superAcumulado = tipoAtaqueAtual.equals("ONDA") ? Math.min(120, superAcumulado + 25) : 0;
         } else {
-            // Errou (faixa vermelha)
-            if (labelStatusTurno != null) labelStatusTurno.setText("* Você falhou no tempo!");
+            if (labelStatusTurno != null) labelStatusTurno.setText("Voce falhou no tempo!");
             if (tipoAtaqueAtual.equals("SUPER")) superAcumulado = 0;
         }
 
@@ -557,18 +617,67 @@ public class GameplayController implements Initializable {
 
         if (vilao != null && vilao.getHpAtual() <= 0) {
 
-            jogador.ganharSuplemento();
-            
-            if (episodioResolvido == 1) {
-                jogador.setDerrotouAbutre(true);
-            } else if (episodioResolvido == 2) {
-                jogador.setDerrotouShocker(true);
-            } else if (episodioResolvido == 3) {
-                jogador.setDerrotouLagarto(true);
+            if (jogador != null) jogador.ganharSuplemento();
+
+            // BUG CORRIGIDO: vencer uma luta nunca chamava jogador.adicionarXp(), então o
+            // XP do jogador ficava sempre em 0 (mesmo zerando o save, nunca havia ganho).
+            // Usa o XP cadastrado pro vilão (vilao.getXpRecompensa()); se o banco não tiver
+            // esse valor preenchido (0), cai num valor padrão crescente por episódio para
+            // que a recompensa não fique nula mesmo com dados incompletos no banco.
+            if (jogador != null) {
+                int xpGanho = (vilao.getXpRecompensa() > 0) ? vilao.getXpRecompensa() : (episodioResolvido * 50);
+                jogador.adicionarXp(xpGanho);
+            }
+
+            if (jogador != null) {
+                if (episodioResolvido == 1) {
+                    jogador.setDerrotouAbutre(true);
+                } else if (episodioResolvido == 2) {
+                    jogador.setDerrotouShocker(true);
+                } else if (episodioResolvido == 3) {
+                    jogador.setDerrotouLagarto(true);
+                }
+            }
+
+            // BUG CORRIGIDO: vencer o vilão só atualizava flags em memória no objeto
+            // Jogador (setDerrotouAbutre/Shocker/Lagarto), mas nada gravava isso no
+            // banco na tabela fases_progresso, que é o que o ModoHistoriaController
+            // realmente lê para decidir quais episódios mostrar desbloqueados. Por
+            // isso vencer o episódio 1 nunca liberava o episódio 2 na tela de
+            // seleção. Aqui chamamos FaseProgressoDAO.desbloquearEpisodio() para o
+            // PRÓXIMO episódio (episodioResolvido + 1), que é o método que já existe
+            // no DAO para isso.
+            //
+            // BUG CORRIGIDO: pelo mesmo motivo, o XP ganho com adicionarXp() só existia
+            // em memória - nunca era salvo, por isso "zerar o jogo" sempre mostrava XP 0.
+            // Agora chamamos JogadorDAO.atualizar(jogador), que já salva xp_atual, hp_atual
+            // e nivel_atual de uma vez. Ambas as gravações rodam na mesma thread em segundo
+            // plano, para não travar a animação de vitória esperando o banco responder.
+            int proximoEpisodio = episodioResolvido + 1;
+            if (jogador != null) {
+                final int idJogadorFinal = jogador.getIdJogador();
+                final Jogador jogadorParaSalvar = jogador;
+                final int proximoEpisodioFinal = proximoEpisodio;
+                Thread threadGravacao = new Thread(() -> {
+                    try {
+                        new JogadorDAO().atualizar(jogadorParaSalvar);
+                    } catch (SQLException ex) {
+                        System.err.println("Erro ao salvar progresso do jogador (XP/HP/nivel): " + ex.getMessage());
+                    }
+                    if (proximoEpisodioFinal <= 3) {
+                        try {
+                            new FaseProgressoDAO().desbloquearEpisodio(idJogadorFinal, proximoEpisodioFinal);
+                        } catch (SQLException ex) {
+                            System.err.println("Erro ao desbloquear episodio " + proximoEpisodioFinal + ": " + ex.getMessage());
+                        }
+                    }
+                });
+                threadGravacao.setDaemon(true);
+                threadGravacao.start();
             }
 
             if (labelStatusTurno != null)
-                labelStatusTurno.setText("⭐ Vitória! O vilão foi derrotado.");
+                labelStatusTurno.setText("Vitoria! O vilao foi derrotado.");
 
             Timeline vitoriaDelay = new Timeline(new KeyFrame(Duration.seconds(2.0), e -> {
                 SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml");
@@ -603,22 +712,22 @@ public class GameplayController implements Initializable {
 
     @FXML
     private void usarSentidoAranha() {
+        if (jogador == null) return;
         jogador.setHpAtual(Math.min(jogador.getHpMaximo(), jogador.getHpAtual() + 15));
-        if (labelStatusTurno != null) labelStatusTurno.setText("* Sentido Aranha ativado! +15 HP.");
+        if (labelStatusTurno != null) labelStatusTurno.setText("Sentido Aranha ativado! +15 HP.");
         concluirAcaoSuporte();
     }
 
     @FXML
-private void usarSuplemento() {
+    private void usarSuplemento() {
+        if (jogador == null) return;
+        if (jogador.usarSuplemento()) {
+            if (labelStatusTurno != null)
+                labelStatusTurno.setText("Voce recuperou +15 HP.");
 
-    if (jogador.usarSuplemento()) {
-
-        if (labelStatusTurno != null)
-            labelStatusTurno.setText("* Você recuperou +15 HP.");
-
-        concluirAcaoSuporte();
+            concluirAcaoSuporte();
+        }
     }
-}
 
     private void concluirAcaoSuporte() {
         atualizarUI();
@@ -637,6 +746,7 @@ private void usarSuplemento() {
             iconeCoracaoAranha.setLayoutY(55);
         }
         jaLevouDanoNesteTurno = false;
+        explosoesJaDetonadas.clear();
 
         if (caixaCombateUndertale != null) {
             caixaCombateUndertale.getChildren().removeAll(elementosAtaqueAtivos);
@@ -649,6 +759,8 @@ private void usarSuplemento() {
     private void executarAtaqueEspecificoVilao() {
         int tipoAtaque = random.nextInt(3) + 1;
 
+        if (loopBatalha != null) loopBatalha.stop();
+
         loopBatalha = new AnimationTimer() {
             private double tempoDecorrido = 0;
 
@@ -656,12 +768,22 @@ private void usarSuplemento() {
             public void handle(long now) {
                 tempoDecorrido += 0.016;
 
-                double velocidadePlayer = 4.0;
-                if (iconeCoracaoAranha != null) {
-                    if (cima && iconeCoracaoAranha.getLayoutY() > 10) iconeCoracaoAranha.setLayoutY(iconeCoracaoAranha.getLayoutY() - velocidadePlayer);
-                    if (baixo && iconeCoracaoAranha.getLayoutY() < 100) iconeCoracaoAranha.setLayoutY(iconeCoracaoAranha.getLayoutY() + velocidadePlayer);
-                    if (esquerda && iconeCoracaoAranha.getLayoutX() > 10) iconeCoracaoAranha.setLayoutX(iconeCoracaoAranha.getLayoutX() - velocidadePlayer);
-                    if (direita && iconeCoracaoAranha.getLayoutX() < 600) iconeCoracaoAranha.setLayoutX(iconeCoracaoAranha.getLayoutX() + velocidadePlayer);
+                // Velocidade de esquiva aumentada (4.0 -> 5.5): combinado com a frequência
+                // reduzida dos ataques do Shocker/Lagarto, dá tempo real de reagir e desviar.
+                double velocidadePlayer = 5.5;
+                if (iconeCoracaoAranha != null && caixaCombateUndertale != null) {
+                    double margemSeguranca = 6.0;
+                    double larguraIcone = iconeCoracaoAranha.getFitWidth();
+                    double alturaIcone = iconeCoracaoAranha.getFitHeight();
+                    double limiteEsquerdoJogador = margemSeguranca;
+                    double limiteDireitoJogador = caixaCombateUndertale.getWidth() - larguraIcone - margemSeguranca;
+                    double limiteSuperiorJogador = margemSeguranca;
+                    double limiteInferiorJogador = caixaCombateUndertale.getHeight() - alturaIcone - margemSeguranca;
+
+                    if (cima && iconeCoracaoAranha.getLayoutY() > limiteSuperiorJogador) iconeCoracaoAranha.setLayoutY(iconeCoracaoAranha.getLayoutY() - velocidadePlayer);
+                    if (baixo && iconeCoracaoAranha.getLayoutY() < limiteInferiorJogador) iconeCoracaoAranha.setLayoutY(iconeCoracaoAranha.getLayoutY() + velocidadePlayer);
+                    if (esquerda && iconeCoracaoAranha.getLayoutX() > limiteEsquerdoJogador) iconeCoracaoAranha.setLayoutX(iconeCoracaoAranha.getLayoutX() - velocidadePlayer);
+                    if (direita && iconeCoracaoAranha.getLayoutX() < limiteDireitoJogador) iconeCoracaoAranha.setLayoutX(iconeCoracaoAranha.getLayoutX() + velocidadePlayer);
                 }
 
                 if (episodioResolvido == 1) {
@@ -674,7 +796,10 @@ private void usarSuplemento() {
 
                 verificarColisoesEImpacto();
 
-                if (tempoDecorrido >= 4.0) {
+                // Dificuldade aumentada (pedido do usuário): turno do vilão de 4s -> 6s,
+                // dando mais tempo de ataques contínuos sem remover os limites de
+                // quantidade simultânea (que é o que mantém a esquiva justa/possível).
+                if (tempoDecorrido >= 6.0) {
                     this.stop();
                     finalizarTurnoDefensivo();
                 }
@@ -707,53 +832,101 @@ private void usarSuplemento() {
         }
     }
 
+    // Conjunto auxiliar: marca quais nós de explosão já causaram dano (telégrafo -> explosão real)
+    private java.util.Set<javafx.scene.Node> explosoesJaDetonadas = new java.util.HashSet<>();
+
     private void processarAtaquesShocker(int tipo, double tempo) {
-        if (tipo == 1 && Math.random() < 0.02) {
-            Rectangle onda = new Rectangle(12, 40, Color.DEEPPINK);
-            onda.setLayoutX(640); onda.setLayoutY(random.nextBoolean() ? 15 : 75);
-            adicionarObjetoAoPainel(onda);
-        }
-        if (tipo == 2 && tempo < 0.05) {
-            for (int i = 0; i < 3; i++) {
-                Circle exp = new Circle(4, Color.ORANGERED);
-                exp.setLayoutX(150 + (i * 160)); exp.setLayoutY(65);
-                adicionarObjetoAoPainel(exp);
+        // Dificuldade aumentada (pedido do usuário): frequências e limites de
+        // quantidade simultânea subiram um pouco em relação à versão anterior,
+        // mantendo os mesmos sprites e o telégrafo da explosão intactos.
+
+        // TIPO 1: raio vindo da direita
+        if (tipo == 1 && Math.random() < 0.018 && elementosAtaqueAtivos.size() < 5) {
+            ImageView raio = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque2-shocker.png", 50, 50);
+            if (raio != null) {
+                raio.setLayoutX(640);
+                raio.setLayoutY(random.nextInt(110) + 10);
+                adicionarObjetoAoPainel(raio);
             }
         }
-        if (tipo == 3 && Math.random() < 0.04 && elementosAtaqueAtivos.size() < 5) {
-            Circle pulso = new Circle(8, Color.YELLOW);
-            pulso.setLayoutX(random.nextInt(550) + 30); pulso.setLayoutY(random.nextInt(90) + 15);
-            adicionarObjetoAoPainel(pulso);
+
+        // TIPO 2: explosões com telégrafo. Antes só disparava uma vez por turno
+        // (tempo < 0.05); agora repete a cada ~2s do turno (mais ondas de explosão),
+        // mantendo a mesma lógica de telégrafo (cresce -> só aí causa dano).
+        boolean momentoDeNovaOndaExplosao = (tempo < 0.05) || (Math.abs(tempo % 2.0) < 0.05);
+        if (tipo == 2 && momentoDeNovaOndaExplosao && elementosAtaqueAtivos.size() < 6) {
+            for (int i = 0; i < 3; i++) {
+                ImageView exp = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque-explosao-shocker.png", 10, 10);
+                if (exp != null) {
+                    exp.setLayoutX(120 + (i * 180));
+                    exp.setLayoutY(40);
+                    exp.setOpacity(0.35); // começa como "aviso" translúcido
+                    adicionarObjetoAoPainel(exp);
+                }
+            }
+        }
+
+        // TIPO 3: cometas caindo em diagonal
+        if (tipo == 3 && Math.random() < 0.028 && elementosAtaqueAtivos.size() < 5) {
+            ImageView cometa = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/ataque-shocker.png", 45, 45);
+            if (cometa != null) {
+                cometa.setLayoutX(random.nextInt(550) + 20);
+                cometa.setLayoutY(-50);
+                adicionarObjetoAoPainel(cometa);
+            }
         }
 
         for (javafx.scene.Node node : elementosAtaqueAtivos) {
-            if (node instanceof Circle) {
-                Circle c = (Circle) node;
-                if (tipo == 2 && c.getRadius() < 45) c.setRadius(c.getRadius() + 1.2);
-            } else {
-                node.setLayoutX(node.getLayoutX() - 5);
+            if (node instanceof ImageView) {
+                ImageView iv = (ImageView) node;
+                String caminho = iv.getImage() != null ? iv.getImage().getUrl() : "";
+
+                if (caminho != null && caminho.contains("ataque2-shocker")) {
+                    // Raio: anda da direita pra esquerda
+                    iv.setLayoutX(iv.getLayoutX() - 4.5);
+                } else if (caminho != null && caminho.contains("ataque-explosao-shocker")) {
+                    // Explosão: cresce lentamente (telégrafo). Ao chegar no tamanho final,
+                    // marca como "detonada" pela primeira vez - é esse instante que conta pra dano.
+                    if (iv.getFitWidth() < 70) {
+                        double novoTamanho = iv.getFitWidth() + 1.1;
+                        iv.setFitWidth(novoTamanho);
+                        iv.setFitHeight(novoTamanho);
+                        iv.setOpacity(Math.min(1.0, 0.35 + (novoTamanho / 70.0) * 0.65));
+                    } else if (!explosoesJaDetonadas.contains(iv)) {
+                        explosoesJaDetonadas.add(iv);
+                    }
+                } else if (caminho != null && caminho.contains("ataque-shocker")) {
+                    // Cometa: cai em diagonal (desce e desliza levemente pra esquerda)
+                    iv.setLayoutY(iv.getLayoutY() + 4.5);
+                    iv.setLayoutX(iv.getLayoutX() - 1.5);
+                }
             }
         }
     }
 
     private void processarAtaquesLagarto(int tipo, double tempo) {
-        if (tipo == 1 && Math.random() < 0.02) {
+        // Dificuldade aumentada (pedido do usuário): frequências e limites de
+        // quantidade simultânea subiram em relação à versão anterior, mantendo o
+        // limite de quantidade no tipo 2 (que corrigiu o bug do "spam impossível").
+        if (tipo == 1 && Math.random() < 0.018 && elementosAtaqueAtivos.size() < 5) {
             ImageView gosma = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/gosma.png", 30, 30);
             if (gosma != null) { gosma.setLayoutX(random.nextInt(580) + 20); gosma.setLayoutY(-30); adicionarObjetoAoPainel(gosma); }
         }
-        if (tipo == 2 && Math.random() < 0.03) {
+        if (tipo == 2 && Math.random() < 0.02 && elementosAtaqueAtivos.size() < 4) {
             ImageView corrida = criarProjetilImagem("/com/mycompany/entreSombrasETeias/jogo/imagens/gosma.png", 40, 20);
             if (corrida != null && iconeCoracaoAranha != null) { corrida.setLayoutX(-40); corrida.setLayoutY(iconeCoracaoAranha.getLayoutY()); adicionarObjetoAoPainel(corrida); }
         }
-        if (tipo == 3 && tempo < 0.05) {
+        // Tipo 3 agora repete a cada ~2.2s do turno (antes só disparava uma vez, tempo < 0.05)
+        boolean momentoDeNovoArco = (tempo < 0.05) || (Math.abs(tempo % 2.2) < 0.05);
+        if (tipo == 3 && momentoDeNovoArco && elementosAtaqueAtivos.size() < 4) {
             Rectangle arco = new Rectangle(100, 12, Color.LIMEGREEN);
             arco.setLayoutX(250); arco.setLayoutY(60);
             adicionarObjetoAoPainel(arco);
         }
 
         for (javafx.scene.Node node : elementosAtaqueAtivos) {
-            if (tipo == 1) node.setLayoutY(node.getLayoutY() + 4);
-            else if (tipo == 2) node.setLayoutX(node.getLayoutX() + 8);
+            if (tipo == 1) node.setLayoutY(node.getLayoutY() + 3.2);
+            else if (tipo == 2) node.setLayoutX(node.getLayoutX() + 6);
         }
     }
 
@@ -770,8 +943,22 @@ private void usarSuplemento() {
     }
 
     private void verificarColisoesEImpacto() {
-        if (iconeCoracaoAranha == null) return;
+        if (iconeCoracaoAranha == null || jogador == null) return;
         for (javafx.scene.Node node : elementosAtaqueAtivos) {
+
+            // BUG CORRIGIDO (pedido do usuário): a explosão do Shocker tinha que dar tempo
+            // do jogador fugir ANTES de explodir de verdade. Enquanto a imagem ainda está
+            // "crescendo" (telégrafo), ela não causa dano - só conta como ataque de verdade
+            // depois que chega no tamanho final e é marcada em explosoesJaDetonadas.
+            if (node instanceof ImageView) {
+                ImageView iv = (ImageView) node;
+                String caminho = iv.getImage() != null ? iv.getImage().getUrl() : "";
+                boolean ehExplosaoShocker = caminho != null && caminho.contains("ataque-explosao-shocker");
+                if (ehExplosaoShocker && !explosoesJaDetonadas.contains(iv)) {
+                    continue; // ainda em telégrafo, não causa dano
+                }
+            }
+
             if (node.getBoundsInParent().intersects(iconeCoracaoAranha.getBoundsInParent())) {
                 if (!jaLevouDanoNesteTurno) {
                     jogador.setHpAtual(Math.max(0, jogador.getHpAtual() - 15));
@@ -791,7 +978,7 @@ private void usarSuplemento() {
         if (caixaCombateUndertale != null) caixaCombateUndertale.getChildren().removeAll(elementosAtaqueAtivos);
         elementosAtaqueAtivos.clear();
 
-        if (jogador.getHpAtual() <= 0) {
+        if (jogador != null && jogador.getHpAtual() <= 0) {
             if (telaGameOver != null) telaGameOver.setVisible(true);
         } else {
             iniciarTurnoJogador();
@@ -805,5 +992,5 @@ private void usarSuplemento() {
     }
 
     @FXML private void executarFugir() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/gameover.fxml"); }
-    @FXML private void voltarMenuInicial() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/menu.fxml"); }
+    @FXML private void voltarMenuInicial() { SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/menu.fxml"); }
 }

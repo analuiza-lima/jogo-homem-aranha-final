@@ -45,24 +45,6 @@
                 <Button fx:id="btnEp3" onAction="#jogarEp3" text="🔒" styleClass="botao-historia-bloqueado" />
             </VBox>
 
-            <VBox alignment="TOP_CENTER" spacing="20.0" styleClass="card-episodio-bloqueado" HBox.hgrow="ALWAYS">
-                <Label text="EP 04" styleClass="titulo-card-ep-bloqueado" />
-                <AnchorPane styleClass="container-decorativo-teia" VBox.vgrow="ALWAYS" />
-                <Button fx:id="btnEp4" onAction="#jogarEp4" text="🔒" styleClass="botao-historia-bloqueado" />
-            </VBox>
-
-            <VBox alignment="TOP_CENTER" spacing="20.0" styleClass="card-episodio-bloqueado" HBox.hgrow="ALWAYS">
-                <Label text="EP 05" styleClass="titulo-card-ep-bloqueado" />
-                <AnchorPane styleClass="container-decorativo-teia" VBox.vgrow="ALWAYS" />
-                <Button fx:id="btnEp5" onAction="#jogarEp5" text="🔒" styleClass="botao-historia-bloqueado" />
-            </VBox>
-
-            <VBox alignment="TOP_CENTER" spacing="20.0" styleClass="card-episodio-bloqueado" HBox.hgrow="ALWAYS">
-                <Label text="EP 06" styleClass="titulo-card-ep-bloqueado" />
-                <AnchorPane styleClass="container-decorativo-teia" VBox.vgrow="ALWAYS" />
-                <Button fx:id="btnEp6" onAction="#jogarEp6" text="🔒" styleClass="botao-historia-bloqueado" />
-            </VBox>
-
         </children>
     </HBox>
 
