@@ -8,11 +8,17 @@
 <?import javafx.scene.image.ImageView?>
 <?import java.net.URL?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-            fx:controller="com.mycompany.entreSombrasETeias.controller.TeiaConfrontosController" 
-            prefWidth="800" prefHeight="600" 
-            style="-fx-background-image: url('com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center; -fx-font-family: 'Press Start 2P';">
-    
+<AnchorPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.mycompany.entreSombrasETeias.controller.TeiaConfrontosController"
+            prefWidth="800" prefHeight="600"
+            style="-fx-background-image: url('/com/mycompany/entreSombrasETeias/jogo/imagens/homemaranhainicial.jpg'); -fx-background-size: cover; -fx-background-position: center; -fx-font-family: 'Press Start 2P';">
+    <!--
+        BUG CORRIGIDO: o caminho da imagem de fundo estava relativo ("com/mycompany/...", sem "/" inicial),
+        o que faz o JavaFX resolver a URL como relativa ao arquivo de stylesheet/FXML em vez do
+        classpath raiz. Dependendo de onde o FXML é carregado a partir disso, a imagem de fundo
+        simplesmente não aparecia. Agora o caminho é absoluto a partir da raiz do classpath ("/com/...").
+    -->
+
     <stylesheets>
         <URL value="@../css/estilo.css" />
     </stylesheets>
@@ -24,41 +30,28 @@
         <Label text="Selecione o vilão que deseja enfrentar para iniciar a batalha" style="-fx-text-fill: white; -fx-font-size: 11px; -fx-font-family: 'Press Start 2P'; -fx-effect: dropshadow(three-pass-box, black, 4, 0, 0, 0);" />
     </VBox>
 
-    <HBox alignment="CENTER" spacing="15.0" prefHeight="160.0" AnchorPane.topAnchor="180.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+    <!--
+        Layout reajustado para 3 ícones: aumentei o espaçamento (spacing) e o tamanho dos ícones
+        (de 110x110 para 140x140) para ocupar bem o espaço horizontal disponível, em vez de deixar
+        os 3 botões pequenos e isolados no centro da tela como ficaria mantendo os valores originais.
+    -->
+    <HBox alignment="CENTER" spacing="40.0" prefHeight="170.0" AnchorPane.topAnchor="180.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
         <children>
             <Button fx:id="btnAbutre" onAction="#selecionarAbutre" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2; -fx-padding: 0;">
                 <graphic>
-                    <ImageView fx:id="imgAbutre" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="false" />
+                    <ImageView fx:id="imgAbutre" fitWidth="140.0" fitHeight="140.0" pickOnBounds="true" preserveRatio="false" />
                 </graphic>
             </Button>
 
             <Button fx:id="btnShocker" onAction="#selecionarShocker" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2; -fx-padding: 0;">
                 <graphic>
-                    <ImageView fx:id="imgShocker" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="false" />
+                    <ImageView fx:id="imgShocker" fitWidth="140.0" fitHeight="140.0" pickOnBounds="true" preserveRatio="false" />
                 </graphic>
             </Button>
 
             <Button fx:id="btnLagarto" onAction="#selecionarLagarto" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2; -fx-padding: 0;">
                 <graphic>
-                    <ImageView fx:id="imgLagarto" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="false" />
-                </graphic>
-            </Button>
-
-            <Button fx:id="btnElectro" onAction="#selecionarElectro" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2; -fx-padding: 0;">
-                <graphic>
-                    <ImageView fx:id="imgElectro" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="false" />
-                </graphic>
-            </Button>
-
-            <Button fx:id="btnOctopus" onAction="#selecionarOctopus" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2; -fx-padding: 0;">
-                <graphic>
-                    <ImageView fx:id="imgOctopus" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="false" />
-                </graphic>
-            </Button>
-
-            <Button fx:id="btnDuende" onAction="#selecionarDuende" styleClass="btn-icon-vilao" style="-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2; -fx-padding: 0;">
-                <graphic>
-                    <ImageView fx:id="imgDuende" fitWidth="110.0" fitHeight="110.0" pickOnBounds="true" preserveRatio="false" />
+                    <ImageView fx:id="imgLagarto" fitWidth="140.0" fitHeight="140.0" pickOnBounds="true" preserveRatio="false" />
                 </graphic>
             </Button>
         </children>

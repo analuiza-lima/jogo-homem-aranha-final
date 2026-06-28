@@ -16,17 +16,11 @@ public class TeiaConfrontosController {
     @FXML private Button btnAbutre;
     @FXML private Button btnShocker;
     @FXML private Button btnLagarto;
-    @FXML private Button btnElectro;
-    @FXML private Button btnOctopus;
-    @FXML private Button btnDuende;
     @FXML private Button btnConfirmar;
 
     @FXML private ImageView imgAbutre;
     @FXML private ImageView imgShocker;
     @FXML private ImageView imgLagarto;
-    @FXML private ImageView imgElectro;
-    @FXML private ImageView imgOctopus;
-    @FXML private ImageView imgDuende;
 
     private Button botaoSelecionadoAtual = null;
     private String vilaoEscolhido = "";
@@ -38,23 +32,17 @@ public class TeiaConfrontosController {
         todosBotoes.add(btnAbutre);
         todosBotoes.add(btnShocker);
         todosBotoes.add(btnLagarto);
-        todosBotoes.add(btnElectro);
-        todosBotoes.add(btnOctopus);
-        todosBotoes.add(btnDuende);
 
         todasImagens.add(imgAbutre);
         todasImagens.add(imgShocker);
         todasImagens.add(imgLagarto);
-        todasImagens.add(imgElectro);
-        todasImagens.add(imgOctopus);
-        todasImagens.add(imgDuende);
 
         // Configura todas as ImageViews para preencherem totalmente o espaço do ícone
         configurarTamanhoImagens();
 
         // Renderiza em P&B com segurança contra caminhos errados de arquivos
         resetarImagensParaPretoEBranco();
-        
+
         // Garante que o botão de confirmar comece desativado até escolherem um vilão
         if (btnConfirmar != null) {
             btnConfirmar.setDisable(true);
@@ -85,24 +73,14 @@ public class TeiaConfrontosController {
         processarSelecao(btnLagarto, imgLagarto, "lagarto", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-lagarto-escolha-vilao.jpg");
     }
 
-    @FXML
-    void selecionarElectro(ActionEvent event) {
-        processarSelecao(btnElectro, imgElectro, "electro", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-electro-escolha-vilao.jpeg");
-    }
-
-    @FXML
-    void selecionarOctopus(ActionEvent event) {
-        processarSelecao(btnOctopus, imgOctopus, "octopus", "/com/mycompany/entreSombrasETeias/jogo/imagens/icon-octopus-escolha-vilao.jpeg");
-    }
-
-    @FXML
-    void selecionarDuende(ActionEvent event) {
-        processarSelecao(btnDuende, imgDuende, "duende", "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde.jpg");
-    }
-
     private void processarSelecao(Button botaoClicado, ImageView imgView, String nomeVilao, String caminhoImagemColorida) {
+        // BUG CORRIGIDO: se algum botão/imagem vier nulo do FXML (fx:id incorreto, por exemplo),
+        // o método inteiro saía sem aplicar a seleção, deixando o estado inconsistente
+        // (botão sem destaque, vilão não salvo, botão confirmar nunca habilitado).
+        // Agora cada acesso é protegido individualmente, e a seleção lógica (vilaoEscolhido)
+        // continua valendo mesmo que algum elemento visual específico esteja ausente.
         resetarImagensParaPretoEBranco();
-        
+
         for (Button btn : todosBotoes) {
             if (btn != null) {
                 btn.setStyle("-fx-cursor: hand; -fx-background-color: rgba(0,0,0,0.4); -fx-border-color: black; -fx-border-width: 2;");
@@ -117,13 +95,10 @@ public class TeiaConfrontosController {
             botaoClicado.setStyle("-fx-cursor: hand; -fx-background-color: rgba(255,34,34,0.3); -fx-border-color: #ff2222; -fx-border-width: 3;");
         }
 
-        try (InputStream is = getClass().getResourceAsStream(caminhoImagemColorida)) {
-            if (is != null) {
-                imgView.setImage(new Image(is));
-            }
-        } catch (Exception e) {
-            System.err.println("Erro ao carregar textura colorida: " + caminhoImagemColorida);
-        }
+        // BUG CORRIGIDO: antes este método chamava imgView.setImage(...) diretamente,
+        // sem checar null e sem o mesmo tratamento de erro usado em carregarImagemSegura.
+        // Agora reaproveita o método seguro, evitando duplicação e NPE caso imgView seja nulo.
+        carregarImagemSegura(imgView, caminhoImagemColorida);
 
         if (btnConfirmar != null) {
             btnConfirmar.setDisable(false);
@@ -134,9 +109,6 @@ public class TeiaConfrontosController {
         carregarImagemSegura(imgAbutre, "/com/mycompany/entreSombrasETeias/jogo/imagens/abutre-pb.jpeg");
         carregarImagemSegura(imgShocker, "/com/mycompany/entreSombrasETeias/jogo/imagens/shocker-pb.jpeg");
         carregarImagemSegura(imgLagarto, "/com/mycompany/entreSombrasETeias/jogo/imagens/lagarto-pb.jpeg");
-        carregarImagemSegura(imgElectro, "/com/mycompany/entreSombrasETeias/jogo/imagens/electro-pb.jpeg");
-        carregarImagemSegura(imgOctopus, "/com/mycompany/entreSombrasETeias/jogo/imagens/octopus-pb.jpeg");
-        carregarImagemSegura(imgDuende, "/com/mycompany/entreSombrasETeias/jogo/imagens/duende-verde-branco.png");
     }
 
     private void carregarImagemSegura(ImageView imgView, String caminho) {
@@ -156,10 +128,10 @@ public class TeiaConfrontosController {
     void confirmarConfronto(ActionEvent event) {
         if (!vilaoEscolhido.isEmpty()) {
             System.out.println("Batalha iniciada contra: " + vilaoEscolhido);
-            
-            // Define o vilão selecionado na sua estrutura de sessão para que a tela de combate saiba com quem lutar
-            SessaoJogo.get().setVilaoAtual(vilaoEscolhido); 
-            
+
+            // Define o vilão selecionado na sessão para que a tela de combate saiba com quem lutar
+            SessaoJogo.get().setVilaoAtual(vilaoEscolhido);
+
             // Troca para a tela onde a gameplay/combate acontece de fato
             SceneManager.trocarTela("/com/mycompany/entreSombrasETeias/jogo/fxml/gameplay.fxml");
         }

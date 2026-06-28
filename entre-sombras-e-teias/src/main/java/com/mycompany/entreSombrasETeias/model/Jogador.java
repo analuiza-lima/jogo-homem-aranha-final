@@ -6,14 +6,19 @@ public class Jogador {
     private int    xpAtual;
     private int    hpAtual;
     private int    nivelAtual;
-
+    private boolean derrotouAbutre;
+    private boolean derrotouShocker;
+    private boolean derrotouLagarto;
+    private int suplementos;
+    
     public Jogador() {}
 
     public Jogador(String nome) {
         this.nome       = nome;
         this.xpAtual   = 0;
         this.nivelAtual = 1;    
-        this.hpAtual   = getHpMaximo(); // Começa com o HP máximo do nível 1
+        this.hpAtual   = getHpMaximo();
+        this.suplementos = 0;
     }
 
     // Calcula o HP Máximo baseado no nível atual do Peter (100 base + 20 por nível)
@@ -78,4 +83,52 @@ public class Jogador {
     public void setNivelAtual(int nivelAtual) {
         this.nivelAtual = nivelAtual;
     }
+    
+    public boolean isDerrotouAbutre() {
+    return derrotouAbutre;
+}
+
+    public void setDerrotouAbutre(boolean derrotouAbutre) {
+        this.derrotouAbutre = derrotouAbutre;
+    }
+
+    public boolean isDerrotouShocker() {
+        return derrotouShocker;
+    }
+
+    public void setDerrotouShocker(boolean derrotouShocker) {
+        this.derrotouShocker = derrotouShocker;
+    }
+
+    public boolean isDerrotouLagarto() {
+        return derrotouLagarto;
+    }
+
+    public void setDerrotouLagarto(boolean derrotouLagarto) {
+        this.derrotouLagarto = derrotouLagarto;
+    }
+    
+    public int getSuplementos() {
+    return suplementos;
+}
+
+public void setSuplementos(int suplementos) {
+    this.suplementos = suplementos;
+}
+
+public void ganharSuplemento() {
+    suplementos++;
+}
+
+public boolean usarSuplemento() {
+
+    if (suplementos <= 0)
+        return false;
+
+    suplementos--;
+
+    setHpAtual(getHpAtual() + 15);
+
+    return true;
+}
 }
